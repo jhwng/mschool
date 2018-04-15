@@ -607,7 +607,9 @@ EOD;
 	} 
 	require ('class_schedule_row_entry.php');
 	$j += 1;
-	if ( $cancelReason <> "W" && $cancelReason <> "T" && cancelReason <> "CXL" ) $classCnt += 1;  // only count not cancelled entries 
+
+	//jng -- bug in cancelReason <> "CXL" !! -- missing '$' in front of cancelReason
+	if ( $cancelReason <> "W" && $cancelReason <> "T" && $cancelReason <> "CXL" ) $classCnt += 1;  // only count not cancelled entries
   }
 
 // display lesson count for the last month
