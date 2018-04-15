@@ -1,0 +1,95 @@
+/* CSS Document */
+
+<style type="text/css">
+
+
+.formtext {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+
+table {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.bluetext {color: #0000FB}
+
+input.btn{
+   color:#050;
+   font-family:Arial, Helvetica, sans-serif;
+   font-size:90%;
+   font-weight:normal;
+   background-color:#fed;
+   border:1px solid;
+   border-top-color:#696;
+   border-left-color:#696;
+   border-right-color:#363;
+   border-bottom-color:#363;
+   filter:progid:DXImageTransform.Microsoft.Gradient
+      (GradientType=0,StartColorStr='#ffffffff',EndColorStr='#ffeeddaa');}
+	  
+	  
+INPUT,TEXTAREA { font-family: Arial, Helvetica, sans-serif; font-size: 11px; }
+
+.dropdowntext { font-family: Arial, Helvetica, sans-serif; font-size: 11px; }
+
+input.btnhov{
+   border-top-color:#c63;
+   border-left-color:#c63;
+   border-right-color:#930;
+   border-bottom-color:#930;}
+.screentitle {font-size: 24px}
+.style2 {
+	font-size: 18px;
+	color: #006699;
+	font-family: "Times New Roman", Times, serif;
+}
+.style3 {color: #0000FB; font-size: 18px; }
+.style4 {
+	color: #800000;
+	font-size: 14px;
+	font-weight: bold;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.style6 {
+	color: #0000FB;
+	font-size: 14px;
+	font-weight: normal;
+}
+
+.banner_text {
+	font-family: "Times New Roman", Times, serif;
+	font-weight: bold;
+	font-style: italic;
+	font-size: 18px;
+	color: #993399;
+}
+
+
+#hintbox{ /*CSS for pop up hint box */
+position:absolute;
+top: 0;
+background-color: lightyellow;
+width: 150px; /*Default width of hint.*/ 
+padding: 3px;
+border:1px solid black;
+font:normal 11px Verdana;
+line-height:18px;
+z-index:100;
+border-right: 3px solid black;
+border-bottom: 3px solid black;
+visibility: hidden;
+}
+
+.hintanchor{ /*CSS for link that shows hint onmouseover*/
+color: black;
+margin: 3px 8px;
+}
+
+
+
+</style>

@@ -1,0 +1,125 @@
+<style type="text/css">
+<!--
+.style7 {
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.styleT {
+	font-size: 11px;
+	color: black
+}
+-->
+</style>
+<?php if ( $sectionCnt == 3 || $sectionCnt == 5 || $sectionCnt == 7 || $sectionCnt == 9 || $sectionCnt == 11 ) { echo '<div style="page-break-after:always">&nbsp;</div>'; }?>
+<table width="750" border="0" cellspacing="0" cellpadding="0" >
+  <tr>
+    <td width="177" height="25" valign="top" class="style3 style7">Permission to Use Child's Photos:</td>
+    <td width="6">&nbsp;</td>
+    <td width="567" valign="top">&nbsp;</td>
+  </tr>
+   <tr>
+    <td height="15" valign="top" class="style3 styleT">Please circle "Yes" or "No":</td>
+    <td>&nbsp;</td>
+    <td valign="top" class="style3 styleT">
+	<strong>Yes</strong>, I give permission to Pro-Music to use photos of my child on Pro-Music's promotional pamphlets.
+	<br><br>
+	<strong>Yes</strong>, I give permission to Pro-Music to use photos of my child on Pro-Music's webiste.
+	<br><br>
+	<strong>Yes</strong>, I give permission to Pro-Music to use photos of my child on Pro-Music's Facebook page.
+	<br><br>
+	<strong>No</strong>, I do not wish my child's picture to be used on Pro-Music's promotional material.
+    
+	<br><br>Initial: ________________</BR>&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="177" height="25" valign="top" class="style3 style7">School Policies</td>
+    <td width="6">&nbsp;</td>
+    <td width="567" valign="top">&nbsp;</td>
+  </tr>
+  
+ <tr>
+    <td height="15" valign="top" class="style3 styleT">Cancellations: </td>
+    <td>&nbsp;</td>
+    <td valign="top" class="style3 styleT">Cancellation notice must be received by our office staff <strong>before 6pm the day before the lesson day</strong> to qualify for a make-up lesson.  Make-up lessons are also granted for all teacher's cancellations.
+    </BR>&nbsp;</td>
+  </tr>
+  
+  <tr>
+    <td height="15" valign="top" class="style3 styleT">Payment: </td>
+    <td>&nbsp;</td>
+    <td valign="top" class="style3 styleT">
+      <strong>Option A:</strong> Monthly payments – cash or debit only. <BR>
+	Customer’s credit card number must be provided.   If payment is not received by the first lesson of the month, customer’s credit card will automatically be charged the total of the monthly payment plus a $5 administrative fee.
+<BR>
+    <strong>Option B:</strong> Semester prepayment (5 months) – cash, cheque, debit or credit card. <BR>
+Students who prepay for the term are entitled to one (1) free emergency cancellation (less than 24 hours notice) during the term. <BR>
+<strong>Option C:</strong> Year prepayment (10 months) – cash, cheque, debit or credit card.<BR>
+Students who prepay for the year are entitled to three (3) free emergency cancellations (less than 24 hours notice) during the school year (Sept to June).
+</BR>&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td height="15" valign="top" class="style3 styleT">NSF Cheques:</td>
+    <td>&nbsp;</td>
+    <td valign="top" class="style3 styleT">Pro-Music will charge a <strong>$15.00</strong> fee on all cheques returned by the bank.
+      </BR>&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td height="15" valign="top" class="style3 styleT">Refunds/Credits/Adjustment:</td>
+    <td>&nbsp;</td>
+    <td valign="top" class="style3 styleT">All tuition adjustments are only made at the end of the school year or at the time of termination. 
+    <br />&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td height="15" valign="top" class="style3 styleT">Make-up Lessons: </td>
+    <td>&nbsp;</td>
+    <td valign="top" class="style3 styleT">Credits from student's cancellation are <STRONG>non-refundable</STRONG> and can only be used towards make-up lessons. All make-up lessons must be taken within 3 months of the original cancellation date.  Pro-Music does not guarantee openings for make-up lessons and will schedule them according to teacher’s availability. Missed make-up lessons may not be re-scheduled again.</BR>&nbsp;</td>
+  </tr>
+  
+  <tr>
+    <td height="15" valign="top" class="style3 styleT">Snow storms: </td>
+    <td>&nbsp;</td>
+    <td valign="top" class="style3 styleT">In case of class cancellations due to snow storms, we will NOT call students individually. Please call us <STRONG>2 hours</STRONG> before your lesson to confirm if classes have been cancelled. Make up lessons will be granted for snow storm cancellations.</BR>&nbsp;
+    </td>
+  </tr>
+
+  <tr>
+    <td height="15" valign="top" class="style3 styleT">Termination: </td>
+    <td>&nbsp;</td>
+    <td valign="top" class="style3 styleT">It is understood and agreed that a <STRONG>two-week notice</STRONG> is required   to withdraw from the program. Tuition is payable for the duration of the 2-week period whether lessons are taken or not. Credits from missed lessons are non-refundable upon termination. However, they may be used as tuition towards make up or other lessons. </BR>&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td height="15" valign="top" class="style3 styleT">Suspension of Student : </td>
+    <td>&nbsp;</td>
+    <td valign="top" class="style3 styleT">Pro-Music reserves the right to suspend students for non-payment of tuition, extreme absence or inappropriate conduct. <br />
+    &nbsp;</td>
+  </tr>
+
+  <tr>
+    <td height="15" valign="top" class="style3 styleT">Cancellation of Instruction: </td>
+    <td>&nbsp;</td>
+    <td valign="top" class="style3 styleT">Pro-Music reserves the right to cancel any course or level of instruction at any time without notice or liability other than to refund tuition fees received for lessons cancelled due to such cancellation or closing. </BR>&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td height="15" valign="top" class="style3 styleT">Supply Teacher: </td>
+    <td>&nbsp;</td>
+    <td valign="top" class="style3 styleT">Pro-Music reserves the right to provide supply teachers due to the cancellation of the original instructor without advance notice. </td>
+  </tr>
+
+  <tr>
+    <td valign="top">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="left">      I have read and agree to the above mentioned school policies. <br>
+        <br />
+        <br>
+     Signature of Parent/Guardian: _______________________________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date: ___________________ </div></td>
+  </tr>
+</table>

@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Untitled Document</title>
+
+<script language="javascript">
+function getColor() {
+  colorButtons = self.opener.document.forms[0].color
+  for (var i = 0; i < colorButtons.length; i++ ) {
+    if (colorButtons[i].checked) {
+	  return colorButtons[i].value
+	}
+  }
+  return "white"
+}
+</script>
+
+</head>
+
+<script language="javascript">
+document.write ("<body bgcolor='" + getColor() + "'>")
+</script>
+
+<h1>This is a new widnow</h1>
+<form>
+<input type="button" value="Who's in the Main widnows?"
+   onClick="alert(self.opener.document.title)"><P>
+   type ext here for the main window:
+   <input type="text" size=25
+   onChange="self.opener.document.forms[0].entry.value = this.value">
+</form>
+
+</body>
+</html>

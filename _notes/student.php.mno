@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_group_lessons" value="name:group_lesson;datatype:string" />
+	<infoitem key="UD_course_names" value="name:course_name;datatype:string" />
+	<infoitem key="UD_teacher" value="name:teacher;datatype:string" />
+</info>
