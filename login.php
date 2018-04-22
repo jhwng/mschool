@@ -4,8 +4,9 @@ $_SESSION['logged'] = 0;
 
 require_once('Connections/promusic.php'); 
 mysql_select_db($database_promusic, $promusic);
-$userName = $_POST['username'];
-$passWord = $_POST['password'];
+
+$userName = isset($_POST['username']) ? $_POST['username'] : ''; //jng
+$passWord = isset($_POST['password']) ? $_POST['password'] : ''; //jng
 
 if ( isset($_POST['Submit'])) {
   $query = "SELECT user_id, user_type, password as passwordDB FROM user WHERE user_name = \"$userName\"; ";
@@ -16,7 +17,7 @@ if ( isset($_POST['Submit'])) {
     extract($row);
   }	
   else {
-    $passwordDB = "not valid kdieodkeie";
+    $passwordDB = "not valid";
   }
   
   if ( $passWord == $passwordDB && $user_type < 20 ) {
@@ -37,7 +38,7 @@ if ( isset($_POST['Submit'])) {
 <body onLoad='document.form1.password.focus();'>
 <?php include "banner1.php"; ?>
 <p>
-	<form id="form1" name="form1" actin="login.php" method="post" >
+	<form id="form1" name="form1" actin="login.php" method="post" autocomplete="off" >
 	  <table width="750" border="0" cellspacing="0" cellpadding="0">
       <tr>
 	  <td width="230">&nbsp;</td>
@@ -45,7 +46,7 @@ if ( isset($_POST['Submit'])) {
 	    <br>
 <input type="hidden" name="redirect" value="<?php echo $_POST['redirect']; ?>">
 	  Username: <input type="text" name="username" value="<?php echo $_POST['username']; ?>"><br>
-	  Password:&nbsp; <input type="password" name="password"><p>
+	  Password:&nbsp; <input type="password" name="password" autocomplete="new-password"><p>
 	<input name="Submit" type="submit" class="btn" id="Submit"
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Login"/>
       </td>
@@ -73,7 +74,7 @@ else {
 	  $redirect = "index.php";
 	}
 	?>
-	<form id="form1" name="form1" actin="login.php" method="post" >
+	<form id="form1" name="form1" actin="login.php" method="post" autocomplete="off">
 	  <table width="750" border="0" cellspacing="0" cellpadding="0">
       <tr>
 	  <td width="230">&nbsp;</td>
@@ -81,7 +82,7 @@ else {
 	    <br>
 <input type="hidden" name="redirect" value="<?php echo $_GET['redirect']; ?>">
 	  Username: <input type="text" name="username"><br>
-	  Password: &nbsp;<input type="password" name="password"><p>
+	  Password: &nbsp;<input type="password" name="password" autocomplete="new-password"><p>
 	<input name="Submit" type="submit" class="btn" id="Submit"
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Login"/>
       </td>
