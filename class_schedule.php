@@ -15,7 +15,63 @@ $row_course_names = mysql_fetch_assoc($course_names);
 $totalRows_course_names = mysql_num_rows($course_names);
 */
 
-$action=$_GET['action'];
+//Bjng -- initialize local vars
+$action= isset($_GET['action']) ? $_GET['action']: '';
+$startdate='';
+$enddate='';
+$fullname='';
+$name_tie_breaker='';
+$home_tel='';
+$student_id='';
+$cancelonly='';
+$cancelmakeup='';
+$nocancel='';
+$numRows=0;
+$totalRows_classes=0;
+$course_name='';
+$curYear=0;
+$curMonth=0;
+$skipStartEndDate=0;
+//Ejng
+
+//Bjng
+//if ( $action == "next_year" || $action =="prev_year") {
+if ( isset($_REQUEST['getNextYear']) || isset($_REQUEST['getPrevYear']) ){
+    $startdate = $_POST['start_date'];
+    $enddate=$_POST['end_date'];
+    //echo "start: $startdate ";
+    //echo "end: $enddate ";
+
+    $startdate_array=date_parse($startdate);
+    $enddate_array=date_parse($enddate);
+
+    //if ($action == "next_year") {
+    if (isset($_REQUEST['getNextYear'])) {
+        $startYear = $startdate_array['year'] + 1;
+        $endYear = $enddate_array['year'] + 1;
+    }
+    else { // prev_year
+        $startYear = $startdate_array['year'] - 1;
+        $endYear = $enddate_array['year'] - 1;
+    }
+
+    $start_month_day=strstr($startdate, '-');
+    $end_month_day=strstr($enddate, '-');
+
+    /* Just need to set $startdate and $enddate here. The other vars like
+     * $fullname, $coursename, etc are set in the logic below since $action
+     * is still "searchclasses".
+     */
+    $startdate = $startYear . $start_month_day;
+    $enddate = $endYear . $end_month_day;
+
+    //echo "start: $startdate ";
+    //echo "end: $enddate ";
+
+    $skipStartEndDate = 1;
+}
+//Ejng
+
 if ( $action == "newcourse" ) {
   $student_id=$_GET['student_id'];
 //  echo "student_id = $student_id (from GET)<br>";
@@ -29,18 +85,22 @@ if ( $action == "newcourse" ) {
 }
 if ( $action == "searchclasses" || $action == "getcourse" ) {
   $fullname=$_POST['full_name'];
-  $coursename=$_POST['course_name'];
-  $startdate=$_POST['start_date'];
-  $enddate=$_POST['end_date'];
-  $cancelmakeup=$_POST['cancel_makeup'];
-  $cancelonly=$_POST['cancel_only'];
-  $nocancel=$_POST['no_cancel'];
+  $coursename= isset($_POST['course_name']) ? $_POST['course_name'] : '' ; //jng
+  if ($skipStartEndDate == 0 ) { //jng
+      $startdate = $_POST['start_date'];
+      $enddate = $_POST['end_date'];
+  }
+  $cancelmakeup= isset($_POST['cancel_makeup']) ? $_POST['cancel_makeup'] : ''; //jng
+  $cancelonly= isset($_POST['cancel_only']) ? $_POST['cancel_only'] : ''; //jng
+  $nocancel=isset($_POST['no_cancel']) ? $_POST['no_cancel'] : ''; //jng
   $home_tel=$_POST['home_tel'];
   $student_id=$_POST['student_id'];
   $name_tie_breaker=$_POST['name_tie_breaker'];
+
+  //echo "student id: $student_id"; //jng
 /*  $course=$_POST['course_name']; */
 }
-// setup arrary to display dow
+// setup array to display dow
 	$dayOfWeek[0] = "Sun";
 	$dayOfWeek[1] = "Mon";
 	$dayOfWeek[2] = "Tue";
@@ -55,6 +115,7 @@ $listMth = "";   // listMth is the month for the entries being listed
 if ( $startdate == "" ) {
    $curMth = date("m");
    $curYear = date("Y");
+
    if ( $curMth >= 7 && $curMth <= 12 ) {
      $startdate = $curYear . "-07-01";
 	 $enddate = $curYear + 1;
@@ -195,6 +256,7 @@ and
 <input name="getlist" type="submit" class="btn" id="getlist" 
    onclick='document.form1.action="class_schedule.php?action=getcourse"; return true;'
    onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Get List"/>
+
 &nbsp;
 <input name="cancel_only" type="checkbox" id="cancel_only" value="yes"
    onChange='if (this.checked) { document.form1.cancel_makeup.checked=0; document.form1.no_cancel.checked=0 }'
@@ -214,7 +276,18 @@ No Cancel
 
             </div></td>
           </tr>
-        </table>
+<tr>
+<td><div align="left">
+<input name="getPrevYear" type="submit" class="btn" id="getPrevYear"
+   onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Prev Year"/>
+        <!--onclick='document.form1.action="class_schedule.php?action=prev_year"; return true;'-->
+<input name="getNextYear" type="submit" class="btn" id="getNextYear"
+   onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Next Year"/>
+        <!--onclick='document.form1.action="class_schedule.php?action=next_year"; return true;'-->
+</div>
+</td>
+</tr>
+	</table>
         </div>
       </form>
     </div></td>
@@ -546,10 +619,10 @@ echo '  <table width="1100" border="1" cellspacing="0" cellpadding="1">';
     $rowUser = mysql_fetch_array($resultUser);
     extract($rowUser);
 	
-	$arr_fullName[] = $fullName;
+    $arr_fullName[] = $fullName;
     $arr_teacherName[] = $teacherName;
     $arr_courseID[] = $courseID;
-	$arr_courseName[] = $cname;
+    $arr_courseName[] = $cname;
     $arr_grade[] = $grade;
     $arr_classDate[] = $classDate;
     $arr_classTime[] = $classTime;
@@ -558,7 +631,7 @@ echo '  <table width="1100" border="1" cellspacing="0" cellpadding="1">';
     $arr_cancelTime[] = $cancelTime;
     $arr_extRate[] = $extRate;
     $arr_studentID[] = $studentID;
-	$arr_teacherID[] = $teacherID;
+    $arr_teacherID[] = $teacherID;
     $arr_remarks[] = $remarks;
     $arr_classID[] = $classID;
     $arr_dow[] = $dow;
@@ -566,27 +639,28 @@ echo '  <table width="1100" border="1" cellspacing="0" cellpadding="1">';
     $arr_internalCost[] = $internalCost;
     $arr_classType[] = $classType;
     $arr_costType[] = $costType;
-	$arr_fromStudentCreditID[] = $from_studentCreditID;
-	$arr_toStudentCreditID[] = $to_studentCreditID;
+    $arr_fromStudentCreditID[] = $from_studentCreditID;
+    $arr_toStudentCreditID[] = $to_studentCreditID;
     $arr_userID[] = $userID;
-	$arr_userName[] = $userName;
-	$arr_timestamp[] = $timestamp;
+    $arr_userName[] = $userName;
+    $arr_timestamp[] = $timestamp;
 	
-	list($yyyy, $mm, $dd) = split('[/.-]', $classDate);
+    list($yyyy, $mm, $dd) = split('[/.-]', $classDate);
     $thisEntryMth  = date("m", mktime(0, 0, 0, $mm ,$dd, $yyyy));
 
 //    $classDateTS = mktime(0,0,0,$mm,$dd,$yyyy));
 //    $todayTS = mktime(0,0,0,date("m"), date("d"), date("Y"));
 		
-	// if to_student_id is not null, this is either a W or T entry, get remaining minutes
-	$minute_balance = 0;
-	if ( $cancelReason == "W" || $cancelReason == "T" ) {
+    // if to_student_id is not null, this is either a W or T entry, get remaining minutes
+    $minute_balance = 0;
+    if ( $cancelReason == "W" || $cancelReason == "T" ) {
 	  $query = "SELECT minute_balance from student_credit_minutes " .
 	           "WHERE student_credit_id = $to_studentCreditID";
       $result = mysql_query($query, $promusic) or die(mysql_error());
       $row = mysql_fetch_array($result);
       extract($row);
-	}
+    }
+
     $arr_minuteBalance[] = $minute_balance;
 
     $headerMth = $yyyy . "-" . $mm;

@@ -11,6 +11,10 @@ function Go(){return}
 <script type='text/javascript' src='menu_com.js'></script>
 
 <?php
+
+//phpinfo(); //jng
+$versionNum = ""; //jng
+
 if ( $_SESSION['logged'] == 1 ) {
   $queryUser = "SELECT user_name as thisUserName FROM user WHERE user_id=$thisUserID";
   // echo "$queryUser<br>";
