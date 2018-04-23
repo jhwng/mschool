@@ -11,3 +11,7 @@
 - Fixed undefined vars in login.php & banner1.php
 - Disabled password auto-fill/complete
 - Added "Prev Year" and "Next Year" in class_schedule.php
+
+[2018-04-23]
+- Fix typo in teacher_rates_row_entry.php: $costType --> $cost_type
+

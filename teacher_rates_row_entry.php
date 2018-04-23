@@ -43,7 +43,7 @@ $row_course_names['course_name'] == $course_name ) {echo "selected=\"selected\""
           <td height="20">
 	        <div align="center">
 	          <input name="cost_type<?php echo $j; ?>" <?php echo "VALUE=\"" . $cost_type . "\""; ?> 
-	  type="text" id="cost_type<?php echo $j; ?>" size="4" maxlength="4" onChange='this.style.backgroundColor="#FC9494"; this.value=this.value.toUpperCase(); if ( this.value != "S" && this.value != "F" ) { alert("Please enter S or F"); this.value = "<?php echo "$costType"; ?>" }; if ( this.value == "F" && parseFloat(document.form2.ext_rate<?php echo $j; ?>.value) <= parseFloat(document.form2.cost<?php echo $j; ?>.value) ) { this.value = "<?php echo "$cost_type"; ?>"; alert ("For Fixed Internal Cost, it must be less than External Rate")}' />
+	  type="text" id="cost_type<?php echo $j; ?>" size="4" maxlength="4" onChange='this.style.backgroundColor="#FC9494"; this.value=this.value.toUpperCase(); if ( this.value != "S" && this.value != "F" ) { alert("Please enter S or F"); this.value = "<?php echo "$cost_type"; ?>" }; if ( this.value == "F" && parseFloat(document.form2.ext_rate<?php echo $j; ?>.value) <= parseFloat(document.form2.cost<?php echo $j; ?>.value) ) { this.value = "<?php echo "$cost_type"; ?>"; alert ("For Fixed Internal Cost, it must be less than External Rate")}' />
             </div></td>
           <td height="20">
             <div align="center">
