@@ -15,3 +15,5 @@
 [2018-04-23]
 - Fix typo in teacher_rates_row_entry.php: $costType --> $cost_type
 
+[2018-05-05]
+- Fix wrong init in banner.php; do the init in class_scheduler.php instead

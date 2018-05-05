@@ -13,7 +13,8 @@ function Go(){return}
 <?php
 
 //phpinfo(); //jng
-$versionNum = ""; //jng
+
+if (!isset($versionNum)) $versionNum = ""; //jng
 
 if ( $_SESSION['logged'] == 1 ) {
   $queryUser = "SELECT user_name as thisUserName FROM user WHERE user_id=$thisUserID";

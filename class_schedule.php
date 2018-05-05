@@ -32,6 +32,9 @@ $course_name='';
 $curYear=0;
 $curMonth=0;
 $skipStartEndDate=0;
+$cancelReason=""; //jng
+$rowCount=0;//jng
+$versionNum="1.00.01"; //jng
 //Ejng
 
 //Bjng
