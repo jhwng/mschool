@@ -28,7 +28,7 @@ $cancelmakeup='';
 $nocancel='';
 $numRows=0;
 $totalRows_classes=0;
-$course_name='';
+$coursename='';
 $curYear=0;
 $curMonth=0;
 $skipStartEndDate=0;
@@ -282,10 +282,10 @@ No Cancel
 <tr>
 <td><div align="left">
 <input name="getPrevYear" type="submit" class="btn" id="getPrevYear"
-   onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Prev Year"/>
+   onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Prev Year" disabled style=color:white />
         <!--onclick='document.form1.action="class_schedule.php?action=prev_year"; return true;'-->
 <input name="getNextYear" type="submit" class="btn" id="getNextYear"
-   onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Next Year"/>
+   onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Next Year" disabled style=color:white />
         <!--onclick='document.form1.action="class_schedule.php?action=next_year"; return true;'-->
 </div>
 </td>

@@ -17,3 +17,8 @@
 
 [2018-05-05]
 - Fix wrong init in banner.php; do the init in class_scheduler.php instead
+
+[2018-05-06]
+- Disabled prev-year and next-year buttons for now
+- Fixed $coursename init typo in class_schedule.php
+
