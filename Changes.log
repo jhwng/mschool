@@ -22,3 +22,9 @@
 - Disabled prev-year and next-year buttons for now
 - Fixed $coursename init typo in class_schedule.php
 
+[2018-05-08]
+- Enabled prev-year and next-year buttons
+    - enabled on-click action to be searchclasses
+- Added blinking messages
+- Fixed main.css format/syntax errors
+

@@ -37,6 +37,8 @@ $rowCount=0;//jng
 $versionNum="1.00.01"; //jng
 //Ejng
 
+//echo "action: $action "; //jng
+
 //Bjng
 //if ( $action == "next_year" || $action =="prev_year") {
 if ( isset($_REQUEST['getNextYear']) || isset($_REQUEST['getPrevYear']) ){
@@ -50,10 +52,12 @@ if ( isset($_REQUEST['getNextYear']) || isset($_REQUEST['getPrevYear']) ){
 
     //if ($action == "next_year") {
     if (isset($_REQUEST['getNextYear'])) {
+        //echo "getNextYear ";
         $startYear = $startdate_array['year'] + 1;
         $endYear = $enddate_array['year'] + 1;
     }
     else { // prev_year
+        //echo "getPrevYear ";
         $startYear = $startdate_array['year'] - 1;
         $endYear = $enddate_array['year'] - 1;
     }
@@ -100,7 +104,7 @@ if ( $action == "searchclasses" || $action == "getcourse" ) {
   $student_id=$_POST['student_id'];
   $name_tie_breaker=$_POST['name_tie_breaker'];
 
-  //echo "student id: $student_id"; //jng
+  //echo "student id: $student_id "; //jng
 /*  $course=$_POST['course_name']; */
 }
 // setup array to display dow
@@ -165,7 +169,29 @@ function rowHeader($j, $mmm, $student_id, $fullname, $startdate, $enddate, $cour
 </script>
 
 <link href="main.css" rel="stylesheet" type="text/css" />
+<!-- These blink styles are included here in addition to main.css so
+I don't have to clear all browser caches in promusic, since browsers
+seem to cache external style sheets-->
 <style type="text/css">
+    .red_blink {
+        font-size: 18px;
+        color: #FB0000;
+        font-family: "Times New Roman", Times, serif;
+        animation: blinker 2s linear infinite;
+    }
+
+    .blue_blink {
+        font-size: 18px;
+        color: #3da0fb;
+        font-family: "Times New Roman", Times, serif;
+        animation: blinker 2s linear infinite;
+    }
+
+    @keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+    }
 <!--
 .style8 {font-size: 12px}
 .style9 {font-size: 14px}
@@ -282,11 +308,11 @@ No Cancel
 <tr>
 <td><div align="left">
 <input name="getPrevYear" type="submit" class="btn" id="getPrevYear"
-   onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Prev Year" disabled style=color:white />
-        <!--onclick='document.form1.action="class_schedule.php?action=prev_year"; return true;'-->
+   onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Prev Year"
+        onclick='document.form1.action="class_schedule.php?action=searchclasses"; return true;' />
 <input name="getNextYear" type="submit" class="btn" id="getNextYear"
-   onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Next Year" disabled style=color:white />
-        <!--onclick='document.form1.action="class_schedule.php?action=next_year"; return true;'-->
+   onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Next Year"
+        onclick='document.form1.action="class_schedule.php?action=searchclasses"; return true;' />
 </div>
 </td>
 </tr>
@@ -307,7 +333,7 @@ if ( $numRows > 1 && $action == "getcourse" ) {
     echo "<table width='815' height='40' border='0' cellpadding='0' cellspacing='0'>
   <tr>
     <td width='83'>&nbsp;</td>
-    <td width='606' valign='middle'><div align='center'><span class='style2'>Student has registered more than 1 course</span></div></td>
+    <td width='606' valign='middle'><div align='center'><span class='blue_blink'>Student has registered more than 1 course</span></div></td>
     <td width='61'>&nbsp;</td>
   </tr>
   <tr>
@@ -318,11 +344,19 @@ if ( $numRows > 1 && $action == "getcourse" ) {
 </table>";
 }
 
+//Bjng
+//echo "course: $coursename ";
+if ($coursename == "" || $coursename == "All")
+    $class_not_found_msg="No registered class found.";
+else
+    $class_not_found_msg="No registered class found for <span class=\"red_blink\">$coursename</span>. &nbsp; Choose another course and click Retrieve.";
+//Ejng
+
 if ( $numRows == 0 && $action == "getcourse" ) {
     echo "<table width='815' height='40' border='0' cellpadding='0' cellspacing='0'>
   <tr>
     <td width='83'>&nbsp;</td>
-    <td width='606' valign='middle'><div align='center'><span class='style2'>NO Registered Class Found </span></div></td>
+    <td width='606' valign='middle'><div align='center'><span class='style2'>$class_not_found_msg</span></div></td>
     <td width='61'>&nbsp;</td>
   </tr>
   <tr>
@@ -334,7 +368,6 @@ if ( $numRows == 0 && $action == "getcourse" ) {
 
     echo "<script>document.form1.full_name.focus();document.form1.full_name.select();</script>";
 }  /* End of #rows = 0 */
-
 
 if ( $action == "searchclasses" || $action == "newcourse") {
 // Get course_id first from course name 
@@ -349,7 +382,7 @@ if ( $action == "searchclasses" || $action == "newcourse") {
       echo "<table width='815' height='40' border='0' cellpadding='0' cellspacing='0'>
     <tr>
       <td width='83'>&nbsp;</td>
-      <td width='606' valign='middle'><div align='center'><span class='style2'>NO Registered Class Found </span></div></td>
+      <td width='606' valign='middle'><div align='center'><span class='style2'>$class_not_found_msg</span></div></td>
       <td width='61'>&nbsp;</td>
     </tr>
     <tr>
@@ -369,17 +402,19 @@ if ( $action == "searchclasses" || $action == "newcourse") {
   }
 
 
-/* Get student_id  
-    $query = "select student_id from student where full_name = \"$fullname\";"; 
+/* Get student_id
+    $query = "select student_id from student where full_name = \"$fullname\";";
     $result = mysql_query($query, $promusic) or die(mysql_error());
     list ($student_id, $home_tel) = mysql_fetch_row($result);
-*/	
+*/
 
   $query_classes = "SELECT student.full_name, teacher.teacher, class_schedule.course_id, (select course_name from course where course.course_id = class_schedule.course_id) as cname, class_schedule.grade, class_schedule.date, class_schedule.time, class_schedule.duration, class_schedule.cancelled, class_schedule.cancelled_time, class_schedule.external_rate, class_schedule.student_id, class_schedule.teacher_id, class_schedule.remarks, class_schedule.class_id, class_schedule.dow, class_schedule.rescheduled_from, class_schedule.internal_cost, class_schedule.class_type, class_schedule.cost_type, class_schedule.from_student_credit_id, class_schedule.to_student_credit_id, class_schedule.user_id, DATE_FORMAT(class_schedule.timestamp,'%Y-%m-%d %H:%i') 
 FROM (class_schedule INNER JOIN student ON class_schedule.student_id = student.student_id) INNER JOIN teacher ON class_schedule.teacher_id = teacher.teacher_id
 WHERE (student.student_id=\"$student_id\")";
 
-  if ( $coursename <> "All" && $coursename <> "" ) 
+  //echo "query classes: $query_classes "; //jng
+
+  if ( $coursename <> "All" && $coursename <> "" )
     $query_classes .= " and (class_schedule.course_id = $course_id)";
   if ( $startdate == "" ) $startdate = "1990-01-01";
   if ( $enddate == ""   ) $enddate = "2050-12-31";
@@ -399,7 +434,7 @@ WHERE (student.student_id=\"$student_id\")";
     echo "<table width='815' height='40' border='0' cellpadding='0' cellspacing='0'>
   <tr>
     <td width='83'>&nbsp;</td>
-    <td width='606' valign='middle'><div align='center'><span class='style2'>NO Registered Class Found </span></div></td>
+    <td width='606' valign='middle'><div align='center'><span class='style2'>$class_not_found_msg</span></div></td>
     <td width='61'>&nbsp;</td>
   </tr>
   <tr>
