@@ -1,6 +1,15 @@
 <?php include "auth_inc.php"; ?>
 <?php require_once('Connections/promusic.php'); ?>
 <?php
+
+//Bjng
+$startdate="";
+$fullname="";
+$course_id="";
+$student_id="";
+$numRows=0;
+//Ejng
+
 mysql_select_db($database_promusic, $promusic);
 $query_teacher = "SELECT teacher FROM teacher where active = 'Y' or active is NULL or active = '' ORDER BY teacher";
 $teacherList = mysql_query($query_teacher, $promusic) or die(mysql_error());
@@ -12,27 +21,27 @@ $totalRows_teacher = mysql_num_rows($teacherList);
 // action = 3 - get course list only
 // action = 4 - retrieve  via GET
 
-$action=$_GET['action'];
+$action=isset($_GET['action']) ? $_GET['action']: ""; //jng
 if ( $action <> "" ) {
   if ( $action <> 4 ) {
-    $fullname=$_POST['full_name'];
-    $courseName=$_POST['course_name'];
-    $startdate=$_POST['start_date'];
-    $enddate=$_POST['end_date'];
-	$grade=$_POST['grade'];
-	$external_rate=$_POST['ext_rate'];
-	$internal_cost=$_POST['internal_cost'];
-	$cost_type=$_POST['cost_type'];
-    $time=$_POST['time'];
-    $duration=$_POST['duration'];
-    $student_id=$_POST['student_id'];
-    $course_id=$_POST['course_id'];
-	$fromDate=$_POST['from_date'];
-	$toDate=$_POST['to_date'];
-	$remarks=$_POST['remarks'];
-	$teacher=$_POST['teacher'];
-	$dow=$_POST['dow'];
-	$status=$_POST['status'];
+    $fullname=isset($_POST['full_name']) ? $_POST['full_name'] : "";  //Bjng
+    $courseName=isset($_POST['course_name']) ? $_POST['course_name'] : "";
+    $startdate=isset($_POST['start_date']) ? $_POST['start_date'] : "";
+    $enddate=isset($_POST['end_date']) ? $_POST['end_date'] : "";
+    $grade=isset($_POST['grade']) ? $_POST['grade'] : "";
+    $external_rate=isset($_POST['ext_rate']) ? $_POST['ext_rate'] : "";
+    $internal_cost=isset($_POST['internal_cost']) ? $_POST['internal_cost'] : "";
+    $cost_type=isset($_POST['cost_type']) ? $_POST['cost_type'] : "";
+    $time=isset($_POST['time']) ? $_POST['time'] : "";
+    $duration=isset($_POST['duration']) ? $_POST['duration'] : "";
+    $student_id=isset($_POST['student_id']) ? $_POST['student_id'] : "";
+    $course_id=isset($_POST['course_id']) ? $_POST['course_id'] : "";
+    $fromDate=isset($_POST['from_date']) ? $_POST['from_date'] : "";
+    $toDate=isset($_POST['to_date']) ? $_POST['to_date'] : "";
+    $remarks=isset($_POST['remarks']) ? $_POST['remarks'] : "";
+    $teacher=isset($_POST['teacher']) ? $_POST['teacher'] : "";
+    $dow=isset($_POST['dow']) ? $_POST['dow'] : "";
+    $status=isset($_POST['status']) ? $_POST['status'] : "";  //Ejng
   }
   else {
     $fullname=$_GET['full_name'];
@@ -44,10 +53,10 @@ if ( $action <> "" ) {
 
   // echo "courseName = $courseName<br>";
   if ( $courseName <> "0" && $courseName <> "" ) {
-  $query = "SELECT course_id FROM course WHERE course_name=\"$courseName\";";
-  $result = mysql_query($query, $promusic) or die(mysql_error());
-  $row = mysql_fetch_array($result);
-  extract($row);
+    $query = "SELECT course_id FROM course WHERE course_name=\"$courseName\";";
+    $result = mysql_query($query, $promusic) or die(mysql_error());
+    $row = mysql_fetch_array($result);
+    extract($row);
   }
 }
 
@@ -80,22 +89,27 @@ else {
 $schYear = $fromYear . "-" . $toYear;
 
 if ( $action == 1 || $action == 4 ) {
-  $query = "SELECT teacher.teacher as teacher, student_registered_classes.grade, " .
-           "student_registered_classes.duration, student_registered_classes.time, " .
-		   "student_registered_classes.external_rate, student_registered_classes.dow, " .
-		   "student_registered_classes.internal_cost, student_registered_classes.cost_type, " .
-		   "student_registered_classes.start_date as fromDate, " .
-		   "student_registered_classes.end_date as toDate, " .
-		   "student_registered_classes.status, student_registered_classes.remarks " .
-           "FROM teacher, student_registered_classes " . 
-		   "WHERE student_registered_classes.teacher_id=teacher.teacher_id " .
-		   "AND student_registered_classes.student_id=$student_id " .
-		   "AND student_registered_classes.course_id=$course_id " .
-		   "AND student_registered_classes.school_year=\"$schYear\";";
-  // echo "$query<br>";
-  $result = mysql_query($query, $promusic) or die(mysql_error());
-  $row = mysql_fetch_array($result);
-  extract($row);
+
+    if (isset($student_id) && $student_id != "" &&  //Bjng
+        isset($course_id) && $course_id != "" &&
+        isset($schYear) && $schYear != "") {
+        $query = "SELECT teacher.teacher as teacher, student_registered_classes.grade, " .
+            "student_registered_classes.duration, student_registered_classes.time, " .
+            "student_registered_classes.external_rate, student_registered_classes.dow, " .
+            "student_registered_classes.internal_cost, student_registered_classes.cost_type, " .
+            "student_registered_classes.start_date as fromDate, " .
+            "student_registered_classes.end_date as toDate, " .
+            "student_registered_classes.status, student_registered_classes.remarks " .
+            "FROM teacher, student_registered_classes " .
+            "WHERE student_registered_classes.teacher_id=teacher.teacher_id " .
+            "AND student_registered_classes.student_id=$student_id " .
+            "AND student_registered_classes.course_id=$course_id " .
+            "AND student_registered_classes.school_year=\"$schYear\";";
+        // echo "$query<br>";
+        $result = mysql_query($query, $promusic) or die(mysql_error());
+        $row = mysql_fetch_array($result);
+        extract($row);
+    } //Ejng
 }
 
 ?>
