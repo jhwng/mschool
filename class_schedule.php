@@ -1,3 +1,6 @@
+<?php
+header("Cache-Control: no-store, must-revalidate"); // Experiment with this setting to see if it makes any diff
+?>
 <?php include "auth_inc.php"; ?>
 <?php require_once('Connections/promusic.php'); ?>
 <?php
@@ -17,6 +20,13 @@ $totalRows_course_names = mysql_num_rows($course_names);
 
 //Bjng -- initialize local vars
 $action= isset($_GET['action']) ? $_GET['action']: '';
+
+// Reset per-year-session course name if no action is specified (ie, first landing on this page)
+if ($action ==""){
+    $_SESSION['getPrevOrNextYearSessionCourse'] = "";
+}
+//$setSessionCourseName = 0;
+
 $startdate='';
 $enddate='';
 $fullname='';
@@ -31,7 +41,7 @@ $totalRows_classes=0;
 $coursename='';
 $curYear=0;
 $curMonth=0;
-$skipStartEndDate=0;
+$getNextOrPrevYearAct=0;
 $cancelReason=""; //jng
 $rowCount=0;//jng
 $versionNum="1.00.01"; //jng
@@ -75,7 +85,7 @@ if ( isset($_REQUEST['getNextYear']) || isset($_REQUEST['getPrevYear']) ){
     //echo "start: $startdate ";
     //echo "end: $enddate ";
 
-    $skipStartEndDate = 1;
+    $getNextOrPrevYearAct = 1;
 }
 //Ejng
 
@@ -93,10 +103,44 @@ if ( $action == "newcourse" ) {
 if ( $action == "searchclasses" || $action == "getcourse" ) {
   $fullname=$_POST['full_name'];
   $coursename= isset($_POST['course_name']) ? $_POST['course_name'] : '' ; //jng
-  if ($skipStartEndDate == 0 ) { //jng
+  if ($getNextOrPrevYearAct == 0 ) { //jng
       $startdate = $_POST['start_date'];
       $enddate = $_POST['end_date'];
+
+      // Bjng
+      // Set/initialize a "session" course when user clicks "Get List" or "Retrieve" for
+      // subsequent get-prev-year or get-next-year "session". Note that "Get List" also
+      // invokes an internal "Retrieve" click, so handling "searchclasses" action only
+      // is sufficient.
+      if ($action == "searchclasses") {
+          if ($coursename != "") {
+              $_SESSION['getPrevOrNextYearSessionCourse'] = $coursename;
+          }
+          //$cn = $_SESSION['getPrevOrNextYearSessionCourse'];
+          //echo "1. coursename = $coursename; $cn ";
+      }
   }
+  else if (isset($_SESSION['getPrevOrNextYearSessionCourse'])){
+      // If we're handling a get-prev-year or get-next-year flow and
+      // no session course name is set yet because the previous page
+      // (ie, either following or previous year) had > 1 courses, then
+      // reset $coursename since it's POSTed from previuos page and
+      // may not apply here. On the other hand, if the session course
+      // is set let's set $coursename to that to continue the session.
+      if ($_SESSION['getPrevOrNextYearSessionCourse'] == "") {
+          $coursename = "";
+          //$_SESSION['getPrevOrNextYearSessionCourse'] = $coursename;
+          //$setSessionCourseName = 1;
+      } else {
+          $coursename = $_SESSION['getPrevOrNextYearSessionCourse'];
+      }
+      //$cn = $_SESSION['getPrevOrNextYearSessionCourse'];
+      //echo "2. coursename = $coursename; session course name: $cn ";
+  }
+  else {
+      //echo "3: coursename = $coursename ";
+  } //Ejng
+
   $cancelmakeup= isset($_POST['cancel_makeup']) ? $_POST['cancel_makeup'] : ''; //jng
   $cancelonly= isset($_POST['cancel_only']) ? $_POST['cancel_only'] : ''; //jng
   $nocancel=isset($_POST['no_cancel']) ? $_POST['no_cancel'] : ''; //jng
@@ -247,8 +291,22 @@ body {
 		    { 
 		      echo 'selected="selected"'; 
 		      echo " >$courseName1</option>";
+
+		      // Set the chosen course as the subsequent get-prev-year or get-next-year session course name
+		      $_SESSION['getPrevOrNextYearSessionCourse'] = $coursename; // jng
 			}
 			else {
+		      // Bjng
+              // If we're doing get prev/next year but there's no course name set
+              // (either because the previous page had no course or more than 1 course)
+              // and this is the only course available, set it as get-year-session course name.
+		      if ($getNextOrPrevYearAct == 1 && $numRows == 1 && $coursename == "") {
+		          $coursename = $courseName1;
+		          $_SESSION['getPrevOrNextYearSessionCourse'] = $courseName1;
+                  //$setSessionCourseName = 1;
+              }
+              //Ejng
+
               echo " >$courseName1</option>";
 			}
    		 }
@@ -285,7 +343,6 @@ and
 <input name="getlist" type="submit" class="btn" id="getlist" 
    onclick='document.form1.action="class_schedule.php?action=getcourse"; return true;'
    onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Get List"/>
-
 &nbsp;
 <input name="cancel_only" type="checkbox" id="cancel_only" value="yes"
    onChange='if (this.checked) { document.form1.cancel_makeup.checked=0; document.form1.no_cancel.checked=0 }'
@@ -313,6 +370,8 @@ No Cancel
 <input name="getNextYear" type="submit" class="btn" id="getNextYear"
    onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Next Year"
         onclick='document.form1.action="class_schedule.php?action=searchclasses"; return true;' />
+
+<!--input name="numCoursesInPrevPage" type="hidden" id="num_courses_prev_page" value="<?php /*echo $numRows;*/ ?>" /--> <!--//jng-->
 </div>
 </td>
 </tr>
@@ -343,6 +402,39 @@ if ( $numRows > 1 && $action == "getcourse" ) {
   </tr>
 </table>";
 }
+
+//Bjng
+// get-prev-year or get-next-year session error exit handling
+if ($getNextOrPrevYearAct) {
+    $err_msg = "";
+    if ($student_id == "") {
+        $err_msg = "Choose a student";
+    }
+    else if ($coursename == "") {
+        if ($numRows > 0) {
+            $err_msg = "Click \"Retrieve\" or select a different \"Course\"";
+        }
+        else {
+            $err_msg = "No registered courses";
+        }
+    }
+
+    if ($err_msg != "") {
+        echo "<table width='815' height='40' border='0' cellpadding='0' cellspacing='0'>
+            <tr>
+                <td width='83'>&nbsp;</td>
+                <td width='606' valign='middle'><div align='center'><span class='blue_blink'>$err_msg</span></div></td>
+                <td width='61'>&nbsp;</td>
+            </tr>
+            </table>";
+        exit();
+    }
+
+    /*if ($setSessionCourseName == 1 && $numRows > 1) {
+        $_SESSION['getPrevOrNextYearSessionCourse'] = "";
+    }*/
+}
+//Ejng
 
 //Bjng
 //echo "course: $coursename ";
@@ -408,27 +500,32 @@ if ( $action == "searchclasses" || $action == "newcourse") {
     list ($student_id, $home_tel) = mysql_fetch_row($result);
 */
 
-  $query_classes = "SELECT student.full_name, teacher.teacher, class_schedule.course_id, (select course_name from course where course.course_id = class_schedule.course_id) as cname, class_schedule.grade, class_schedule.date, class_schedule.time, class_schedule.duration, class_schedule.cancelled, class_schedule.cancelled_time, class_schedule.external_rate, class_schedule.student_id, class_schedule.teacher_id, class_schedule.remarks, class_schedule.class_id, class_schedule.dow, class_schedule.rescheduled_from, class_schedule.internal_cost, class_schedule.class_type, class_schedule.cost_type, class_schedule.from_student_credit_id, class_schedule.to_student_credit_id, class_schedule.user_id, DATE_FORMAT(class_schedule.timestamp,'%Y-%m-%d %H:%i') 
+if (isset($student_id) && $student_id != "") { // No need to query DB if student_id is not set or null //jng
+    $query_classes = "SELECT student.full_name, teacher.teacher, class_schedule.course_id, (select course_name from course where course.course_id = class_schedule.course_id) as cname, class_schedule.grade, class_schedule.date, class_schedule.time, class_schedule.duration, class_schedule.cancelled, class_schedule.cancelled_time, class_schedule.external_rate, class_schedule.student_id, class_schedule.teacher_id, class_schedule.remarks, class_schedule.class_id, class_schedule.dow, class_schedule.rescheduled_from, class_schedule.internal_cost, class_schedule.class_type, class_schedule.cost_type, class_schedule.from_student_credit_id, class_schedule.to_student_credit_id, class_schedule.user_id, DATE_FORMAT(class_schedule.timestamp,'%Y-%m-%d %H:%i')
 FROM (class_schedule INNER JOIN student ON class_schedule.student_id = student.student_id) INNER JOIN teacher ON class_schedule.teacher_id = teacher.teacher_id
 WHERE (student.student_id=\"$student_id\")";
 
-  //echo "query classes: $query_classes "; //jng
+    //echo "query classes: $query_classes "; //jng
 
-  if ( $coursename <> "All" && $coursename <> "" )
-    $query_classes .= " and (class_schedule.course_id = $course_id)";
-  if ( $startdate == "" ) $startdate = "1990-01-01";
-  if ( $enddate == ""   ) $enddate = "2050-12-31";
-  $query_classes .= " and (class_schedule.date between \"$startdate\" and \"$enddate\")";
-  if (  $cancelmakeup == "yes" ) 
-    $query_classes .= " and ( (class_schedule.cancelled <> '' AND class_schedule.cancelled is NOT NULL) OR (class_schedule.class_type <> '' AND class_schedule.class_type is NOT NULL) )";
-  if (  $cancelonly == "yes" ) 
-    $query_classes .= " and (class_schedule.cancelled = 'W' OR class_schedule.cancelled = 'T' )";
-  if (  $nocancel == "yes" ) 
-    $query_classes .= " and (class_schedule.cancelled = '' or class_schedule.cancelled is NULL)";
-  $query_classes .= " ORDER BY date, class_schedule.time;";
-  // echo "$query_classes<br>";
-  $classes = mysql_query($query_classes, $promusic) or die(mysql_error());
-  $totalRows_classes = mysql_num_rows($classes);
+    if ($coursename <> "All" && $coursename <> "")
+        $query_classes .= " and (class_schedule.course_id = $course_id)";
+    if ($startdate == "") $startdate = "1990-01-01";
+    if ($enddate == "") $enddate = "2050-12-31";
+    $query_classes .= " and (class_schedule.date between \"$startdate\" and \"$enddate\")";
+    if ($cancelmakeup == "yes")
+        $query_classes .= " and ( (class_schedule.cancelled <> '' AND class_schedule.cancelled is NOT NULL) OR (class_schedule.class_type <> '' AND class_schedule.class_type is NOT NULL) )";
+    if ($cancelonly == "yes")
+        $query_classes .= " and (class_schedule.cancelled = 'W' OR class_schedule.cancelled = 'T' )";
+    if ($nocancel == "yes")
+        $query_classes .= " and (class_schedule.cancelled = '' or class_schedule.cancelled is NULL)";
+    $query_classes .= " ORDER BY date, class_schedule.time;";
+    // echo "$query_classes<br>";
+    $classes = mysql_query($query_classes, $promusic) or die(mysql_error());
+    $totalRows_classes = mysql_num_rows($classes);
+}
+else {
+    $totalRows_classes = 0; // Set total classes rows num for the case where we didn't query DB //jng
+}
   
   if ( $totalRows_classes == 0 ) { 
     echo "<table width='815' height='40' border='0' cellpadding='0' cellspacing='0'>
@@ -650,79 +747,81 @@ echo '  <table width="1100" border="1" cellspacing="0" cellpadding="1">';
   $i = 1;
   $j = 0;   /*  $j is the entry count for indexing the row variables */
   $classCnt = 0;  // number of classes in each month
-  
-  while ( list ( $fullName, $teacherName, $courseID, $cname, $grade, $classDate, $classTime, $duration, $cancelReason, $cancelTime, $extRate, $studentID, $teacherID, $remarks, $classID, $dow, $rescheduledFrom, $internalCost, $classType, $costType, $from_studentCreditID, $to_studentCreditID, $userID, $timestamp ) = mysql_fetch_row($classes)) {
-    $queryUser = "SELECT user_name as userName FROM user WHERE user_id = $userID";
-    $resultUser = mysql_query($queryUser, $promusic) or die(mysql_error());
-    $rowUser = mysql_fetch_array($resultUser);
-    extract($rowUser);
-	
-    $arr_fullName[] = $fullName;
-    $arr_teacherName[] = $teacherName;
-    $arr_courseID[] = $courseID;
-    $arr_courseName[] = $cname;
-    $arr_grade[] = $grade;
-    $arr_classDate[] = $classDate;
-    $arr_classTime[] = $classTime;
-    $arr_duration[] = $duration;
-    $arr_cancelReason[] = $cancelReason;
-    $arr_cancelTime[] = $cancelTime;
-    $arr_extRate[] = $extRate;
-    $arr_studentID[] = $studentID;
-    $arr_teacherID[] = $teacherID;
-    $arr_remarks[] = $remarks;
-    $arr_classID[] = $classID;
-    $arr_dow[] = $dow;
-    $arr_rescheduledFrom[] = $rescheduledFrom;
-    $arr_internalCost[] = $internalCost;
-    $arr_classType[] = $classType;
-    $arr_costType[] = $costType;
-    $arr_fromStudentCreditID[] = $from_studentCreditID;
-    $arr_toStudentCreditID[] = $to_studentCreditID;
-    $arr_userID[] = $userID;
-    $arr_userName[] = $userName;
-    $arr_timestamp[] = $timestamp;
-	
-    list($yyyy, $mm, $dd) = split('[/.-]', $classDate);
-    $thisEntryMth  = date("m", mktime(0, 0, 0, $mm ,$dd, $yyyy));
+
+  if (isset($classes) && $classes != "") { // Do this only if $classes is set and not null //jng
+      while (list ($fullName, $teacherName, $courseID, $cname, $grade, $classDate, $classTime, $duration, $cancelReason, $cancelTime, $extRate, $studentID, $teacherID, $remarks, $classID, $dow, $rescheduledFrom, $internalCost, $classType, $costType, $from_studentCreditID, $to_studentCreditID, $userID, $timestamp) = mysql_fetch_row($classes)) {
+          $queryUser = "SELECT user_name as userName FROM user WHERE user_id = $userID";
+          $resultUser = mysql_query($queryUser, $promusic) or die(mysql_error());
+          $rowUser = mysql_fetch_array($resultUser);
+          extract($rowUser);
+
+          $arr_fullName[] = $fullName;
+          $arr_teacherName[] = $teacherName;
+          $arr_courseID[] = $courseID;
+          $arr_courseName[] = $cname;
+          $arr_grade[] = $grade;
+          $arr_classDate[] = $classDate;
+          $arr_classTime[] = $classTime;
+          $arr_duration[] = $duration;
+          $arr_cancelReason[] = $cancelReason;
+          $arr_cancelTime[] = $cancelTime;
+          $arr_extRate[] = $extRate;
+          $arr_studentID[] = $studentID;
+          $arr_teacherID[] = $teacherID;
+          $arr_remarks[] = $remarks;
+          $arr_classID[] = $classID;
+          $arr_dow[] = $dow;
+          $arr_rescheduledFrom[] = $rescheduledFrom;
+          $arr_internalCost[] = $internalCost;
+          $arr_classType[] = $classType;
+          $arr_costType[] = $costType;
+          $arr_fromStudentCreditID[] = $from_studentCreditID;
+          $arr_toStudentCreditID[] = $to_studentCreditID;
+          $arr_userID[] = $userID;
+          $arr_userName[] = $userName;
+          $arr_timestamp[] = $timestamp;
+
+          list($yyyy, $mm, $dd) = split('[/.-]', $classDate);
+          $thisEntryMth = date("m", mktime(0, 0, 0, $mm, $dd, $yyyy));
 
 //    $classDateTS = mktime(0,0,0,$mm,$dd,$yyyy));
 //    $todayTS = mktime(0,0,0,date("m"), date("d"), date("Y"));
-		
-    // if to_student_id is not null, this is either a W or T entry, get remaining minutes
-    $minute_balance = 0;
-    if ( $cancelReason == "W" || $cancelReason == "T" ) {
-	  $query = "SELECT minute_balance from student_credit_minutes " .
-	           "WHERE student_credit_id = $to_studentCreditID";
-      $result = mysql_query($query, $promusic) or die(mysql_error());
-      $row = mysql_fetch_array($result);
-      extract($row);
-    }
 
-    $arr_minuteBalance[] = $minute_balance;
+          // if to_student_id is not null, this is either a W or T entry, get remaining minutes
+          $minute_balance = 0;
+          if ($cancelReason == "W" || $cancelReason == "T") {
+              $query = "SELECT minute_balance from student_credit_minutes " .
+                  "WHERE student_credit_id = $to_studentCreditID";
+              $result = mysql_query($query, $promusic) or die(mysql_error());
+              $row = mysql_fetch_array($result);
+              extract($row);
+          }
 
-    $headerMth = $yyyy . "-" . $mm;
-	if ( $listMth == "" ) {
-	   rowHeader($j, $headerMth, $student_id, $fullname, $startdate, $enddate, $cname);
-	   $listMth = $thisEntryMth;
-	}
-	if ( $listMth <> $thisEntryMth ) {
-      $bottom =<<<EOD
+          $arr_minuteBalance[] = $minute_balance;
+
+          $headerMth = $yyyy . "-" . $mm;
+          if ($listMth == "") {
+              rowHeader($j, $headerMth, $student_id, $fullname, $startdate, $enddate, $cname);
+              $listMth = $thisEntryMth;
+          }
+          if ($listMth <> $thisEntryMth) {
+              $bottom = <<<EOD
       <tr bgcolor="#FFFFD7">
         <td height="15" colspan="12" nowrap="nowrap" bgcolor="#FFFFFF">No. of lessons: $classCnt</td>
       </tr>
 EOD;
-      echo "$bottom";
-	  $classCnt = 0;
-	  rowHeader ($j, $headerMth, $student_id, $fullname, $startdate, $enddate, $cname);
-	  $listMth = $thisEntryMth;
-	} 
-	require ('class_schedule_row_entry.php');
-	$j += 1;
+              echo "$bottom";
+              $classCnt = 0;
+              rowHeader($j, $headerMth, $student_id, $fullname, $startdate, $enddate, $cname);
+              $listMth = $thisEntryMth;
+          }
+          require('class_schedule_row_entry.php');
+          $j += 1;
 
-	//jng -- bug in cancelReason <> "CXL" !! -- missing '$' in front of cancelReason
-	if ( $cancelReason <> "W" && $cancelReason <> "T" && $cancelReason <> "CXL" ) $classCnt += 1;  // only count not cancelled entries
-  }
+          //jng -- bug in cancelReason <> "CXL" !! -- missing '$' in front of cancelReason
+          if ($cancelReason <> "W" && $cancelReason <> "T" && $cancelReason <> "CXL") $classCnt += 1;  // only count not cancelled entries
+      }
+  } // End $classes validity check //Ejng
 
 // display lesson count for the last month
 $bottom =<<<EOD
