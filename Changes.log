@@ -40,3 +40,7 @@ course_details_form.php:
 - Enhance & fix getPrev and getNext year in class_schedule &  student_name_search
 - Set "no-store, must-revalidate" caching policy in php header in class_schedule
 
+[2018-05-21]
+- Added "Student Profile" buttion in class schedule
+- Minor comments cleanup
+

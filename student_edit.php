@@ -2,9 +2,10 @@
 <?php require_once('Connections/promusic.php'); ?>
 <?php
 
-$versionNum = "1.00.01";
+$versionNum = "1.00.02";
 
 // 1.00.01 - adds hint box for parents/guardian
+// 1.00.02 - handles student profile retrieval from class_schedule via GET (action=5)
 
 mysql_select_db($database_promusic, $promusic);
 $query_group_lessons = "select group_lesson from group_lesson order by group_lesson;";
@@ -60,38 +61,63 @@ include 'banner1.php';
 <?php
 /*
 action = 1 - Create new student, new account and new course
-action = 2 - Only creat a new course for the student
-action = 3 - Retrieve student profile
-actuin = 4 - Commit Edit student profile
+action = 2 - Only create a new course for the student
+action = 3 - Retrieve student profile, from student_edit_form via POST
+             from "Search" (ie, student_name_search)
+action = 4 - Commit Edit student profile
+action = 5 - Retrieve student profile, from class_schedule via GET
 */
-$action = $_GET['action'];
-$submit = $_POST['submit1'];
-$student_id = $_POST['student_id'];
-$account_id = $_POST['account_id'];
-$old_account_id = $_POST['old_account_id'];
-$parents_names = $_POST['parents_names'];
-$newaccount = $_POST['newaccount'];
-$addr1 = $_POST['addr1'];
-$addr2 = $_POST['addr2'];
-$city = $_POST['city'];
-$province = $_POST['province'];
-$postal_code = $_POST['postal_code'];
-$home_tel = $_POST['home_tel'];
-$mother_work_tel = $_POST['mother_work_tel'];
-$mother_cell_tel = $_POST['mother_cell_tel'];
-$father_work_tel = $_POST['father_work_tel'];
-$father_cell_tel = $_POST['father_cell_tel'];
-$parents_email = $_POST['parents_email'];
-$full_name = $_POST['full_name'];
-$name_tie_breaker = $_POST['name_tie_breaker'];
-$birthdate = $_POST['birthdate'];
-$sex = $_POST['sex'];
-$language = $_POST['language'];
-$student_email = $_POST['student_email'];
-$enrollment_date= $_POST['enrollment_date'];
-$discount= $_POST['discount'];
-$discount_expiry_date = $_POST['discount_expiry_date'];
-$related_friends = $_POST['related_friends'];
+
+// Bjng
+$action = isset($_GET['action']) ? $_GET['action'] : "";
+$submit = isset($_POST['submit1']) ? $_POST['submit1'] : "";
+
+if ($action == 5) {
+    $student_id = isset($_GET['student_id']) ? $_GET['student_id'] : "";
+
+    /* get account_id for student table */
+    if ($student_id != "") {
+        $query_aid = "SELECT account_id FROM student WHERE student_id = \"$student_id\"";
+        $account_result = mysql_query($query_aid, $promusic) or die(mysql_error());
+        $row_account = mysql_fetch_array($account_result);
+        extract($row_account);  // this implicitly sets $account_id
+    }
+} else {
+    $student_id = isset($_POST['student_id']) ? $_POST['student_id'] : "";
+    $account_id = isset($_POST['account_id']) ? $_POST['account_id'] : "";
+}
+
+$old_account_id = isset($_POST['old_account_id']) ?
+    $_POST['old_account_id'] : "";  // xxxjng - need to handle GET for this too?
+
+$parents_names = isset($_POST['parents_names']) ? $_POST['parents_names'] : "";
+
+$newaccount = isset($_POST['newaccount']) ?
+    $_POST['newaccount'] : "";      // xxxjng - need to handle GET for this too?
+
+$addr1 = isset($_POST['addr1']) ? $_POST['addr1'] : "";
+$addr2 = isset($_POST['addr2']) ? $_POST['addr2'] : "";
+$city = isset($_POST['city']) ? $_POST['city'] : "";
+$province = isset($_POST['province']) ? $_POST['province'] : "";
+$postal_code = isset($_POST['postal_code']) ? $_POST['postal_code'] : "";
+$home_tel = isset($_POST['home_tel']) ? $_POST['home_tel'] : "";
+$mother_work_tel = isset($_POST['mother_work_tel']) ? $_POST['mother_work_tel'] : "";
+$mother_cell_tel = isset($_POST['mother_cell_tel']) ? $_POST['mother_cell_tel'] : "";
+$father_work_tel = isset($_POST['father_work_tel']) ? $_POST['father_work_tel'] : "";
+$father_cell_tel = isset($_POST['father_cell_tel']) ? $_POST['father_cell_tel'] : "";
+$parents_email = isset($_POST['parents_email']) ? $_POST['parents_email'] : "";
+$full_name = isset($_POST['full_name']) ? $_POST['full_name'] : "";
+$name_tie_breaker = isset($_POST['name_tie_breaker']) ? $_POST['name_tie_breaker'] : "";
+$birthdate = isset($_POST['birthdate']) ? $_POST['birthdate'] : "";
+$sex = isset($_POST['sex']) ? $_POST['sex'] : "";
+$language = isset($_POST['language']) ? $_POST['language'] : "";
+$student_email = isset($_POST['student_email']) ? $_POST['student_email'] : "";
+$enrollment_date= isset($_POST['enrollment_date']) ? $_POST['enrollment_date'] : "";
+$discount= isset($_POST['discount']) ? $_POST['discount'] : "";
+$discount_expiry_date = isset($_POST['discount_expiry_date']) ? $_POST['discount_expiry_date'] : "";
+$related_friends = isset($_POST['related_friends']) ? $_POST['related_friends'] : "";
+// Ejng
+
 /* if (isset($_POST['related_friends'])) {
   $related_friends_str = urlencode("$related_friends");
 }
@@ -114,7 +140,7 @@ $cheque_no = $_POST['cheque_no'];
 $cheque_holders = $_POST['cheque_holders'];
 */
 
-if ( $action == 3 ) 
+if ( $action == 3 || $action == 5)
 {
   if ( !(isset($student_id)) || $student_id == "" ) {
 	echo '<script>alert("You need to select a Student Name by using the Search button\n\n Student profile not retrieved")</script>'; 

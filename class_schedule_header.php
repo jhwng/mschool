@@ -37,6 +37,13 @@
    <input name="submit" type="button" class="btn" id="submit" 
    onClick='location.href="#top"' 
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Top of Page"/>
+
+        <input name="submit2" type="button" class="btn" id="submit2"
+   <?php $url="student_edit.php?student_id=$student_id&action=5"; ?>
+   onclick='studProfWindow=window.open("<?php echo "$url"; ?>", "Student Profile", "location=0,toolbar=0,menubar=0,status=1,height=1000,width=800");
+           studProfWindow.moveBy(800, 0); studProfWindow.focus(); '
+   onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Student Profile"/>
+
       </div></td>
     </tr>
     <tr bgcolor="#E2D8F3">

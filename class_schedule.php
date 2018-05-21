@@ -292,7 +292,8 @@ body {
 		      echo 'selected="selected"'; 
 		      echo " >$courseName1</option>";
 
-		      // Set the chosen course as the subsequent get-prev-year or get-next-year session course name
+              // Set the chosen course as the subsequent get-prev-year or
+              // get-next-year session course name.
 		      $_SESSION['getPrevOrNextYearSessionCourse'] = $coursename; // jng
 			}
 			else {
