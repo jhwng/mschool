@@ -57,7 +57,7 @@ do {
 $row_teacher['teacher'] == $teacher ) {echo "selected=\"selected\""; } ?>><?php echo $row_teacher['teacher']?></option>
               <?php
 } while ($row_teacher = mysql_fetch_assoc($teacherList));
-  $rows = mysql_num_rows($teacherLIst);
+  $rows = mysql_num_rows($teacherList);
   if($rows > 0) {
       mysql_data_seek($teacherList, 0);
 	  $row_teacher = mysql_fetch_assoc($teacherList);
@@ -81,7 +81,7 @@ $row_teacher['teacher'] == $teacher ) {echo "selected=\"selected\""; } ?>><?php 
 	  <?php if ( $action <> "" ) {echo "VALUE=" . "\"$internal_cost\""; } ?>
 	  type="text" id="internal_cost" size="6" maxlength="6" />
 &nbsp;&nbsp;Cost Type:
-<input name="cost_type" onchange='this.value=this.value.toUpperCase(); if ( this.value != "S" && this.value != "F" ) { alert("Please enter S or F")}; if ( this.value == "F" && parseFloat(document.courseform.ext_rate<?php echo $j; ?>.value) <= parseFloat(document.courseform.internal_cost<?php echo $j; ?>.value) ) { alert ("For Fixed Internal Cost, it must be less than External Rate")}'
+<input name="cost_type" onchange='this.value=this.value.toUpperCase(); if ( this.value != "S" && this.value != "F" ) { alert("Please enter S or F")}; if ( this.value == "F" && parseFloat(document.courseform.ext_rate<?php if (isset($j)) echo $j; ?>.value) <= parseFloat(document.courseform.internal_cost<?php if (isset($j)) echo $j; ?>.value) ) { alert ("For Fixed Internal Cost, it must be less than External Rate")}'
   <?php if ( $action <> "" ) {echo "VALUE=" . "\"$cost_type\""; } ?>
   type="text" id="cost_type" size="4" maxlength="4" />
 <span class="bluetext"> ( S or F ) </span></td>

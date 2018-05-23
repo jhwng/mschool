@@ -63,14 +63,14 @@
     <tr>
       <td height="20" valign="middle">&nbsp;</td>
       <td valign="middle">Date of Birth: </td>
-      <td valign="middle"><input name="birthdate" type="text" id="birthdate" size="12" maxlength="12" <?php if ($birthdate <> "") echo "VALUE=\"" . $birthdate . "\""; ?> onChange='checkDateFormat(form, this)' /></td>
+      <td valign="middle"><input name="birthdate" type="text" id="birthdate" size="12" maxlength="12" <?php if (isset($birthdate) && $birthdate <> "") echo "VALUE=\"" . $birthdate . "\""; ?> onChange='checkDateFormat(form, this)' /></td>
     </tr>
     <tr>
       <td height="20" valign="middle">&nbsp;</td>
       <td valign="middle">Sex:</td>
       <td colspan="4" valign="middle"><select name="sex" class="dropdowntext" id="sex">
-        <option value="M" <?php if ( $sex == "M" ) echo 'selected="selected"'; ?>>M</option>
-        <option value="F" <?php if ( $sex == "F" ) echo 'selected="selected"'; ?>>F</option>
+        <option value="M" <?php if ( isset($sex) && $sex == "M" ) echo 'selected="selected"'; ?>>M</option>
+        <option value="F" <?php if ( isset($sex) && $sex == "F" ) echo 'selected="selected"'; ?>>F</option>
       </select></td>
     </tr>
     <tr>
@@ -310,7 +310,7 @@ $row_teacher['teacher'] == $selected_teacher ) {echo "selected=\"selected\""; } 
 	  <?php if ( $action <> "" ) {echo "VALUE=" . "\"$internal_cost\""; } ?>
 	  type="text" id="internal_cost" size="6" maxlength="6" />
   &nbsp;&nbsp;Cost Type:
-  <input name="cost_type" onChange='this.value=this.value.toUpperCase(); if ( this.value != "S" && this.value != "F" ) { alert("Please enter S or F")}; if ( this.value == "F" && parseFloat(document.form1.ext_rate<?php echo $j; ?>.value) <= parseFloat(document.form1.internal_cost<?php echo $j; ?>.value) ) { alert ("For Fixed Internal Cost, it must be less than External Rate")}'
+  <input name="cost_type" onChange='this.value=this.value.toUpperCase(); if ( this.value != "S" && this.value != "F" ) { alert("Please enter S or F")}; if ( this.value == "F" && parseFloat(document.form1.ext_rate<?php if (isset($j)) echo $j; ?>.value) <= parseFloat(document.form1.internal_cost<?php if (isset($j)) echo $j; ?>.value) ) { alert ("For Fixed Internal Cost, it must be less than External Rate")}'
   <?php if ( $action <> "" ) {echo "VALUE=" . "\"$cost_type\""; } ?>
   type="text" id="cost_type" size="4" maxlength="4" />
   <span class="bluetext"> (S or F) </span></td>
