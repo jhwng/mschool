@@ -16,30 +16,43 @@ $totalRows_teacher = mysql_num_rows($teacherList);
 // action = 3 - get course list only
 // action = 4 - retrieve  via GET
 
-$action=$_GET['action'];
+//Bjng
+// initialize vars
+$startdate = "";
+$addStartDate = "";
+$addEndDate = "";
+$fullname = "";
+$student_id="";
+$courseName="";
+$course_id="";
+$numRows=0;
+$holidayList="";
+//Ejng
+
+$action= isset($_GET['action']) ? $_GET['action'] : "";
 if ( $action <> "" ) {
   if ( $action <> 4 ) {
-    $fullname=$_POST['full_name'];
-    $courseName=$_POST['course_name'];
-    $startdate=$_POST['start_date'];
-    $enddate=$_POST['end_date'];
-	$grade=$_POST['grade'];
-	$external_rate=$_POST['ext_rate'];
-	$internal_cost=$_POST['internal_cost'];
-	$cost_type=$_POST['cost_type'];
-    $time=$_POST['time'];
-    $duration=$_POST['duration'];
-    $student_id=$_POST['student_id'];
+    $fullname=isset($_POST['full_name']) ? $_POST['full_name'] : "";
+    $courseName=isset($_POST['course_name']) ? $_POST['course_name'] : "";
+    $startdate=isset($_POST['start_date']) ? $_POST['start_date'] : "";
+    $enddate=isset($_POST['end_date']) ? $_POST['end_date'] : "";
+	$grade=isset($_POST['grade']) ? $_POST['grade'] : "";
+	$external_rate=isset($_POST['ext_rate']) ? $_POST['ext_rate'] : "";
+	$internal_cost=isset($_POST['internal_cost']) ? $_POST['internal_cost'] : "";
+	$cost_type=isset($_POST['cost_type']) ? $_POST['cost_type'] : "";
+    $time=isset($_POST['time']) ? $_POST['time'] : "";
+    $duration=isset($_POST['duration']) ? $_POST['duration'] : "";
+    $student_id=isset($_POST['student_id']) ? $_POST['student_id'] : "";
 //    $dow=$_POST['dow'];
-    $course_id=$_POST['course_id'];
-	$addStartDate=$_POST['add_start_date'];
-	$addEndDate=$_POST['add_end_date'];
-	$updateCourse=$_POST['details_update'];
-	$skipHoliday=$_POST['skip_holiday'];
-	$cStartDate=$_POST['c_start_date'];
-	$cEndDate=$_POST['c_end_date'];
-//	$numClasses=$_POST['num_classes'];
-	$teacher=$_POST['teacher'];
+    $course_id=isset($_POST['course_id']) ? $_POST['course_id'] : "";
+	$addStartDate=isset($_POST['add_start_date']) ? $_POST['add_start_date'] : "";
+	$addEndDate=isset($_POST['add_end_date']) ? $_POST['add_end_date'] : "";
+	$updateCourse=isset($_POST['details_update']) ? $_POST['details_update'] : "";
+	$skipHoliday=isset($_POST['skip_holiday']) ? $_POST['skip_holiday'] : "";
+	$cStartDate=isset($_POST['c_start_date']) ? $_POST['c_start_date'] : "";
+	$cEndDate=isset($_POST['c_end_date']) ? $_POST['c_end_date'] : "";
+//	$numClasses=$_POST['num_classes']);
+	$teacher=isset($_POST['teacher']) ? $_POST['teacher'] : "";
 	$teacherName = $teacher;
   }
   else {
@@ -91,22 +104,29 @@ else {
 }
 $schYear = $fromYear . "-" . $toYear;
 
-if ( $action == 1 || ( $action == 4 && $course_id <> "" )) {
-  $query = "SELECT teacher.teacher as teacherName, student_registered_classes.grade, " .
-           "student_registered_classes.start_date as cStartDate, student_registered_classes.end_date as cEndDate, " .
-           "student_registered_classes.duration, student_registered_classes.time, " .
-		   "student_registered_classes.internal_cost, student_registered_classes.cost_type, " .
-		   "student_registered_classes.external_rate, student_registered_classes.dow " .
-           "FROM teacher, student_registered_classes " . 
-		   "WHERE student_registered_classes.teacher_id=teacher.teacher_id " .
-		   "AND student_registered_classes.student_id=$student_id " .
-		   "AND student_registered_classes.course_id=$course_id " .
-		   "AND student_registered_classes.school_year=\"$schYear\";";
-  // echo "$query<br>";
-  $result = mysql_query($query, $promusic) or die(mysql_error());
-  $row = mysql_fetch_array($result);
-  extract($row);
-}
+//if ( $action == 1 || ( $action == 4 && $course_id <> "" )) {
+if ($action == 1 || $action == 4) { //Bjng
+  if ( $course_id <> ""
+       && $student_id <> ""
+       && $schYear <> "" ) {
+    $query = "SELECT teacher.teacher as teacherName, student_registered_classes.grade, " .
+        "student_registered_classes.start_date as cStartDate, student_registered_classes.end_date as cEndDate, " .
+        "student_registered_classes.duration, student_registered_classes.time, " .
+        "student_registered_classes.internal_cost, student_registered_classes.cost_type, " .
+        "student_registered_classes.external_rate, student_registered_classes.dow " .
+        "FROM teacher, student_registered_classes " .
+        "WHERE student_registered_classes.teacher_id=teacher.teacher_id " .
+        "AND student_registered_classes.student_id=$student_id " .
+        "AND student_registered_classes.course_id=$course_id " .
+        "AND student_registered_classes.school_year=\"$schYear\";";
+    // echo "$query<br>";
+    $result = mysql_query($query, $promusic) or die(mysql_error());
+    $row = mysql_fetch_array($result);
+
+    if ($row > 0) //jng
+        extract($row);
+  }
+} //Ejng
 ?>
 
 <script>
@@ -229,8 +249,15 @@ body {
    onclick='document.form1.action="add_classes.php?action=3"; return true;'
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Get Course List"/>
 &nbsp;&nbsp;&nbsp;
-<input name="retrieve" type="submit" class="btn" id="retrieve" 
-   onclick='document.form1.action=&quot;add_classes.php?action=1"; return true;'
+<input name="retrieve" type="submit" class="btn" id="retrieve"
+   onclick='
+     if (document.form1.course_name.value == "") {
+       alert("No course selected.\nSelect from \"Course\" or click \"Get Course List\" first.");
+       return false;
+     } else {
+       document.form1.action=&quot;add_classes.php?action=1";
+       return true;
+     }'
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Retrieve Course Details"/>
               </div></td>
             </tr>
@@ -242,7 +269,10 @@ body {
 
 <?php
 // if student only have 1 course registered, retrieve course details right away
-if ( $numRows == 1 && $action == 3 ) { echo "<script>document.form1.retrieve.click()</script>"; }
+if ( $numRows == 1 && $action == 3 ) {
+    echo "<script>document.form1.retrieve.click()</script>";
+}
+
 if ( $numRows > 1 && $action == 3 ) { 
     echo "<table width='815' height='40' border='0' cellpadding='0' cellspacing='0'>
   <tr>
@@ -357,10 +387,16 @@ if ( $action == 2 ) {
 	   }
 		  
 	    if  ( $cTimeStamp <= $discountTimeStamp && $discount > 0 ) {
-		  $rate = $ext_rate * ( 100 - $discount) / 100;
+		  //$rate = $ext_rate * ( 100 - $discount) / 100;
+          //echo "ext_rate: $ext_rate; ";
+          //echo "external_rate: $external_rate";
+		  $rate = $external_rate * ( 100 - $discount) / 100;  //jng
 		}
 		else {
-		  $rate = $ext_rate;
+          //echo "ext_rate: $ext_rate; ";
+          //echo "external_rate: $external_rate";
+		  //$rate = $ext_rate;
+		  $rate = $external_rate;  //jng
 		}
 	  
         if ( $skipHoliday <> 1 || $isHoliday == 0 || ( $isHoliday == 1 && $skipHoliday == 0 ) ) 
