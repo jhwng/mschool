@@ -2,13 +2,18 @@
 // Version 1.01 - added user validation at line 46
 ?>
 <?php require_once('Connections/promusic.php'); ?>
+
+<?php require "user_manager_check.php"; ?>
+
 <script type="text/javascript" src="checkform.js"> </script>
 <?php
 mysql_select_db($database_promusic, $promusic);
-$userName = $_POST['username'];
-$passWord = $_POST['password'];
-$uType = $_POST['utype'];
-$button = $_POST['Submit'];
+
+//jng
+$userName = isset($_POST['username']) ? $_POST['username'] : "";
+$passWord = isset($_POST['password']) ? $_POST['password'] : "";
+$uType = isset($_POST['utype']) ? $_POST['utype'] : "";
+$button = isset($_POST['Submit']) ? $_POST['Submit'] : "";
 
 $error = 0;
 if ( $button == "Change User" || $button == "Delete User" ) { 
@@ -150,17 +155,18 @@ if (!( isset($_POST['Submit']))) {
 	  $redirect = "index.php";
 	}
 	?>
-	<form id="form1" name="form1" actin="login.php" method="post" >
+	<form id="form1" name="form1" action="login.php" method="post" >
 	  <table width="750" border="0" cellspacing="0" cellpadding="0">
       <tr>
 	  <td width="230">&nbsp;</td>
 	  <td><span class="style2">User Administration</span><br>
 	    <br>
-<input type="hidden" name="redirect" value="<?php echo $_POST['redirect']; ?>">
+<input type="hidden" name="redirect" value="<?php echo isset($_POST['redirect']) ? $_POST['redirect'] : ""; ?>">
 	  Username:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" name="username" /><br>
 	  Password:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="password" /><br>
-	  User Type (1 or 2 ):&nbsp;<input type="utype" name="utype" value="1" 
-	  onChange='if ( this.value != "1" && this.value != "2" ) { this.value = "1"; alert ("User Type can only be 1 or 2") }' />&nbsp;&nbsp;<span class="bluetext">( 1 for normal user; 2 for administrator )</span><br>
+	  User Type (1 or 2):&nbsp;<input type="utype" name="utype" value="1"
+	  onChange='if ( this.value != "1" && this.value != "2" ) { this.value = "1"; alert ("User Type can only be 1 or 2") }' />
+          <span class="bluetext">( 1 = Regular Employee; 2 = Store Admin)</span><br>
 	  <p>
  <input name="Submit" type="submit" class="btn" id="Submit"
  onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Change User"/>
@@ -189,7 +195,7 @@ if (!( isset($_POST['Submit']))) {
   $result3 = mysql_query($query, $promusic) or die(mysql_error());
   // $numRows = mysql_num_rows($result);
   while ( list ($curUsers, $curType) = mysql_fetch_row($result3)) {
-    if ( $curUsers <> "unknown" && $curUsers <> "wkkc" ) {
+    if ( $curUsers <> "unknown" && $curUsers <> "wkkc" && $curType < 3) {
 	  echo "<tr height='20'><td align='center'>$curUsers</td><td align='center'>$curType</td></tr>";
 	}
   }

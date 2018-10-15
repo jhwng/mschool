@@ -6,6 +6,13 @@ if ( isset($_SESSION['logged']) && $_SESSION['logged'] == 1 ) {
   $thisUserID = $_SESSION['user_id'];
   $thisUserType = $_SESSION['user_type'];
 
+  //jng - 1=normal user (employee); 2= manager; 3=admin/owner; 4=unchanged; 999=unchanged
+  $UserIsManager = false;
+  if ($thisUserType >= 2) {
+      $UserIsManager = true;
+      //echo "User is a manager";
+  }
+
   /*$x = $_SESSION["timeout"];
   echo "session time: $x";
   echo "resetting session timeout";*/

@@ -1,5 +1,8 @@
 <?php include "auth_inc.php"; ?>
 <?php require_once('Connections/promusic.php'); ?>
+
+<?php require "user_manager_check.php"; ?>
+
 <?php
 mysql_select_db($database_promusic, $promusic);
 $query_teacher = "select teacher from teacher where active = 'Y' or active is NULL or active = '' order by teacher;";
@@ -10,9 +13,20 @@ $totalRows_teacher = mysql_num_rows($teacher);
 // action = 1 - retrieve payments via POST
 // action = 2 - update payments
 // action = 3 - Display
-// action =4 - retrieve payments via GET
+// action = 4 - retrieve payments via GET
 
-$action=$_GET['action'];
+$action=isset($_GET['action']) ? $_GET['action'] : "";
+
+//jng - initialize vars (some are needed by teacher_payments_row_entry.php
+$teacherForm1 = "";
+$startdate = "";
+$teacher_id = "";
+$teacherID = 0; //jng - how is this different from $teacher_id ?? Huh??
+$delete = "";
+$teacherName = "";
+$paymentID = 0;
+$changed = "";
+
 if ( $action <> "" ) {
   if ( $action <> 4 ) {
     $teacherForm1=$_POST['teacher'];
@@ -27,18 +41,17 @@ if ( $action <> "" ) {
     $enddate=$_GET['end_date'];
     $teacher_id=$_GET['teacher_id'];
   }
-
 }
 
-    $firstDayOfYear = date ("Y-m-d", mktime(0, 0, 0, 7, 1, $fromYear));
-    $lastDayOfYear = date ("Y-m-d", mktime(0, 0, 0, 6, 30, $toYear));
+//jng - $firstDayOfYear and $lastDayOfYear not used in this file
+/*$firstDayOfYear = date ("Y-m-d", mktime(0, 0, 0, 7, 1, $fromYear));
+$lastDayOfYear = date ("Y-m-d", mktime(0, 0, 0, 6, 30, $toYear));*/
 
 if ( $startdate == "" ) {
    $curMth = date("m");
    $curYear = date("Y");
    $startdate = $curYear . "-" . $curMth . "-01";
    $enddate = date ("Y-m-d", mktime(0, 0, 0, $curMth+1, 0, $curYear));
-   
 }
 
 list($yyyy, $mm, $dd) = split('[/.-]', $startdate);

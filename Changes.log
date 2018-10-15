@@ -55,3 +55,14 @@ Fixed add_classes.php:
 2. undefined $ext_rate
 3. undefined/uninitialized vars
 
+[2018-10-14]
+- Added new user type '3' for owner
+(1=normal user (employee); 2= manager; 3=admin/owner; 4=unchanged; 999=unchanged)
+- Added user_manager_check.php to check for manager user type
+- Block access from normal user to these pages:
+  - user_admin.php
+  - teacher_rates.php
+  - teacher_payments.php
+  - teacher_payroll.php
+  - teacher_group_lessons.php
+

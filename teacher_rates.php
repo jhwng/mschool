@@ -1,5 +1,8 @@
 <?php include "auth_inc.php"; ?>
 <?php require_once('Connections/promusic.php'); ?>
+
+<?php require "user_manager_check.php"; ?>
+
 <?php
 mysql_select_db($database_promusic, $promusic);
 $query_course_names = "SELECT course_name FROM course ORDER BY course_name asc";
@@ -43,12 +46,12 @@ body {
 <?php
 /*
 action = 1 - Retrieve teacher rates
-actuin = 2 - update teacher rates
+action = 2 - update teacher rates
 */
-$action = $_GET['action'];
-$submit = $_POST['submit1'];
-$teacher_id = $_POST['teacher_id'];
-$teacher = $_POST['teacher'];
+$action = isset($_GET['action']) ? $_GET['action'] : "";
+$submit = isset($_POST['submit1']) ? $_POST['submit1'] : "";
+$teacher_id = isset($_POST['teacher_id']) ? $_POST['teacher_id'] : "";
+$teacher = isset($_POST['teacher']) ? $_POST['teacher'] : "";
 
 include 'banner1.php';
 
