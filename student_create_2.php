@@ -66,11 +66,11 @@ include 'banner1.php';
 <?php
 /*
 action = 1 - Create new student, new account and new course
-action = 2 - Only creat a new course for the student
+action = 2 - Only create a new course for the student
 */
 $action = $_GET['action'];
 $submit = $_POST['submit'];
-$newaccount = $_POST['newaccount'];
+$newaccount = isset($_POST['newaccount']) ? $_POST['newaccount'] : ""; //jng
 $parents_names = $_POST['parents_names'];
 $addr1 = $_POST['addr1'];
 $addr2 = $_POST['addr2'];
@@ -107,13 +107,17 @@ $time = $_POST['time'];
 $duration = $_POST['duration'];
 $ext_rate = $_POST['ext_rate'];
 $internal_cost = $_POST['internal_cost'];
+$internal_cost_override = $_POST['internal_cost_override']; //jng
 $cost_type = $_POST['cost_type'];
+$cost_type_override = $_POST['cost_type_override']; //jng
 $start_date = $_POST['start_date'];
 $end_date = $_POST['end_date'];
 $cheque_no = $_POST['cheque_no'];
 $cheque_holders = $_POST['cheque_holders'];
 $submit = $_POST['submit'];
-require('student_create_form.php');
+$holidayList = ""; //jng
+
+require('student_create_form.php'); //jng - why running this form again?
 
 $error=0;
 
@@ -154,7 +158,8 @@ $query_check_account = "SELECT parents_names, home_tel from account " .
 $check_account = mysql_query($query_check_account, $promusic) or die(mysql_error());
 $totalRows_account = mysql_num_rows($check_account);
 /* User said create new account */
-if ( ($_POST['newaccount'] == "yes" ) && $totalRows_account > 0 ) {
+//jng - if ( ($_POST['newaccount'] == "yes" ) && $totalRows_account > 0 ) {
+if ( ($newaccount == "yes" ) && $totalRows_account > 0 ) {
     $error=1;
 	echo "<script>alert('Account Already Exist - Parents Names and Home Phone already exist in database');window.document.form1.parents_names.select(); </script>";
 }
@@ -186,7 +191,8 @@ WHERE (((student.full_name)=\"$full_name\") AND ((student.name_tie_breaker)=\"$n
 }  // end if error = 0
 
 /* Create Account */
-if ( $error == 0 && $_POST['newaccount'] == "yes" ) {
+//jng - if ( $error == 0 && $_POST['newaccount'] == "yes" ) {
+if ( $error == 0 && $newaccount == "yes" ) {
 	 $query_account = "INSERT INTO account
      (parents_names, addr1, addr2, city, province, postal_code, home_tel,
      mother_work_tel, mother_cell_tel, father_work_tel, father_cell_tel, parents_email)
@@ -283,15 +289,31 @@ if ( $error == 0 ) {
 	    $discountTimeStamp = mktime(12,0,0,$mm,$dd,$yyyy);
 	  }
 
+	  //Bjng
+	  $real_internal_cost=$internal_cost;
+      if ($internal_cost_override != "" && is_numeric($internal_cost_override)) {
+        $real_internal_cost=$internal_cost_override;
+      }
+
+      $real_cost_type=$cost_type;
+      if ($cost_type_override == "S" || $cost_type_override == "F") {
+        $real_cost_type=$cost_type_override;
+      }
+	  //Ejng
+
 	  /* Start SQL transaction */
 	  $query = "START TRANSACTION;";
 	  $result = mysql_query($query, $promusic) or die(mysql_error());
 	  
 	  /* Create sutdent_registered_classes */
-  	  $query = "INSERT INTO student_registered_classes
-       ( student_id, course_id, grade, teacher_id, start_date, end_date, dow, school_year, time, duration, external_rate, internal_cost, cost_type) VALUES
-  	   ( $student_id, $course_id, \"$grade\", $teacher_id, \"$start_date\", \"$end_date\", \"$dow\", \"$schYear\", \"$time\", \"$duration\", $ext_rate, $internal_cost, \"$cost_type\" ); ";
-	  echo "$query<br>";
+      //jng
+      /*$query = "INSERT INTO student_registered_classes
+      ( student_id, course_id, grade, teacher_id, start_date, end_date, dow, school_year, time, duration, external_rate, internal_cost, cost_type) VALUES
+      ( $student_id, $course_id, \"$grade\", $teacher_id, \"$start_date\", \"$end_date\", \"$dow\", \"$schYear\", \"$time\", \"$duration\", $ext_rate, $internal_cost, \"$cost_type\" ); "; */
+      $query = "INSERT INTO student_registered_classes
+      ( student_id, course_id, grade, teacher_id, start_date, end_date, dow, school_year, time, duration, external_rate, internal_cost, cost_type) VALUES
+      ( $student_id, $course_id, \"$grade\", $teacher_id, \"$start_date\", \"$end_date\", \"$dow\", \"$schYear\", \"$time\", \"$duration\", $ext_rate, $real_internal_cost, \"$real_cost_type\" ); ";
+	  //echo "$query<br>"; //jng - looks like it's for debugging only?
 	  $result = mysql_query($query, $promusic) or die(mysql_error());
 	  
       /* insert class_schedule and student_scheduled_payments entries, do not create entry if the day is a holiday */
@@ -318,11 +340,17 @@ if ( $error == 0 ) {
 		}
 	  
     	if ( $isHoliday == 0 ) {
-		  $query_class = "INSERT INTO class_schedule " .
+	      //jng
+		  /*$query_class = "INSERT INTO class_schedule " .
 		     "(student_id, course_id, grade, date, time, duration, teacher_id, " .
 			 "dow, internal_cost, cost_type, external_rate, user_Id) " .
 			 "VALUES (\"$student_id\", \"$course_id\", \"$grade\", \"$cDate\", \"$time\", " .
-			 "$duration, \"$teacher_id\",\"$dow\", $internal_cost, \"$cost_type\", $rate, $thisUserID)";
+			 "$duration, \"$teacher_id\",\"$dow\", $internal_cost, \"$cost_type\", $rate, $thisUserID)";*/
+		  $query_class = "INSERT INTO class_schedule " .
+                "(student_id, course_id, grade, date, time, duration, teacher_id, " .
+                "dow, internal_cost, cost_type, external_rate, user_Id) " .
+                "VALUES (\"$student_id\", \"$course_id\", \"$grade\", \"$cDate\", \"$time\", " .
+                "$duration, \"$teacher_id\",\"$dow\", $real_internal_cost, \"$real_cost_type\", $rate, $thisUserID)";
           // echo $query_class . "<br>";       */
 		  $insert_class = mysql_query($query_class, $promusic) or die(mysql_error());
 		  $lessonCnt += 1;
