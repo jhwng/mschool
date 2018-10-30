@@ -108,7 +108,19 @@ function checkTimeFormat(form, time2) {
 	return true;
 }
 
-function check_class_schedule_form(form) {
+function check_class_schedule_form(form, isManager) {
+    /* jng - WTF?? Where's all the checking logic?
+	   from Davina: it could be intentional so that they can easily
+	   override things in "special cases". */
+
+    /* jng - perhaps we should let ONLY Managers to ignore checks? */
+	if (isManager) {
+      //alert("Manager: check_class_schedule_form() called");
+	} else {
+      //alert("Employee: check_class_schedule_form() called");
+	}
+
+    //return false;
 	return true;
 }
 
@@ -202,14 +214,15 @@ function check_student_form(form, source, isManager) {
 
         if (cost_type_check == "F") {
 		  if (ext_rate <= internal_cost_check) {
-            alert ("Invalid \"External Rate\":\nFor \"Fixed Cost Type\" it must be greater than \"Internal Cost\".\n\nPlease check with School Admin.");
+            //alert ("Invalid \"External Rate\":\nFor \"Fixed Cost Type\" it must be greater than \"Internal Cost\".\n\nPlease check with School Admin.");
+            alert ("Invalid \"External Rate\": Please check with School Admin.");
             form.ext_rate.focus();
             return false;
 		  }
 		}
 		else if (cost_type_check == "S") {
           if (internal_cost_check >= 100) {
-            alert("Invalid \"Internal Cost\":\nFor \"Split Cost Type\" it must be less than 100.\n\nPlease check with School Admin.");
+            alert("Invalid \"Internal Cost\":\nFor \"Split Cost Type\" it must be less than 100.");
             form.internal_cost_override.focus();
             return false;
           }

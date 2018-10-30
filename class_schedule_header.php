@@ -2,39 +2,48 @@
       <td height="24" colspan="12" nowrap="nowrap" bgcolor="#ECFFEC"><div align="center">
         <input name="submit" type="submit" class="btn" id="submit" 
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Submit Changes"/>
+
         <input name="submit" type="button" class="btn" id="submit"
    <?php $url="payment_schedule.php?action=4&student_id=$student_id&full_name=" . urlencode($fullname) . "&start_date=$startdate&end_date=$enddate&course_name=$courseName"; ?>
    onClick='location.href="<?php echo "$url"; ?>"'
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="PD Cheques"/>
+
         <input name="submit" type="button" class="btn" id="submit"
    <?php $url="adhoc_payments.php?action=4&student_id=$student_id&full_name=" . urlencode($fullname) . "&start_date=$startdate&end_date=$enddate&course_name=$courseName"; ?>
    onClick="location.href='<?php echo "$url"; ?>'"
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Ad-hoc Payments"/>
+
         <input name="submit" type="button" class="btn" id="submit"
    <?php $url="misc_items.php?action=4&student_id=$student_id&full_name=" . urlencode($fullname) . "&start_date=$startdate&end_date=$enddate&course_name=$courseName"; ?>
    onClick='location.href="<?php echo "$url"; ?>"'
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Other Fees"/>
+
         <input name="submit" type="button" class="btn" id="submit"
    <?php $url="balance_report.php?action=4&student_id=$student_id&full_name=" . urlencode($fullname) . "&start_date=$startdate&end_date=$enddate&course_name=$courseName"; ?>
    onClick='location.href="<?php echo "$url"; ?>"'
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Balance Report"/>
+
         <input name="submit" type="button" class="btn" id="submit"
    <?php $url="add_classes.php?action=4&student_id=$student_id&full_name=" . urlencode($fullname) . "&start_date=$startdate&end_date=$enddate&course_name=$courseName"; ?>
    onClick='location.href="<?php echo "$url"; ?>"'
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Add Classes"/>
+
         <input name="submit" type="button" class="btn" id="submit"
    <?php $url="bulk_changes.php?action=4&student_id=$student_id&full_name=" . urlencode($fullname) . "&start_date=$startdate&end_date=$enddate&course_name=$courseName"; ?>
    onClick='location.href="<?php echo "$url"; ?>"'
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Bulk Changes"/>
+
         <input name="submit2" type="button" class="btn" id="submit2"
    <?php $url="course_details.php?action=4&student_id=$student_id&full_name=" . urlencode($fullname) . "&start_date=$startdate&end_date=$enddate&course_name=$courseName"; ?>
    onclick='location.href=&quot;<?php echo "$url"; ?>&quot;'
    onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Course Details"/>
+
         <input name="submit" type="button" class="btn" id="submit"
    <?php $url="class_listing.php?&student_id=$student_id&full_name=" . urlencode($fullname) . "&start_date=$startdate&end_date=$enddate&course_name=$courseName"; ?>
    onClick='enrollWindow=window.open("<?php echo $url; ?>","classListing","location,status,resizable=yes,scrollbars,toolbar,menubar"); enrollWindow.focus();'
-   onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="  Print  " />           
-   <input name="submit" type="button" class="btn" id="submit" 
+   onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="  Print  " />
+
+        <input name="submit" type="button" class="btn" id="submit"
    onClick='location.href="#top"' 
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Top of Page"/>
 

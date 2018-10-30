@@ -341,10 +341,10 @@ $row_teacher['teacher'] == $selected_teacher ) {echo "selected=\"selected\""; } 
             //jng: since we need to consider cost_type, cost_type_override, internal_cost,
             // internal_cost_override etc, it is just easier to do all the checks in checkform.js.
             /*if (this.value == "F" &&
-                  //jng - raymond bug!!
+                  //jng - raymond bug/dead code?? $j is never set here...
                   //((parseFloat(document.form1.ext_rate<?php if (isset($j)) echo $j; ?>.value) <=
-                  //  parseFloat(document.form1.internal_cost<?php if (isset($j)) echo $j; ?>.value))
-              alert ("For Fixed Internal Cost, it must be less than External Rate")
+                  //  parseFloat(document.form1.internal_cost<?php if (isset($j)) echo $j; ?>.value))) {
+              alert ("For Fixed Internal Cost, it must be less than External Rate");
             }*/ '
           <?php //jng
             if ( $action <> "" ) {
@@ -369,7 +369,7 @@ $row_teacher['teacher'] == $selected_teacher ) {echo "selected=\"selected\""; } 
         <td height="1" colspan="2" valign="middle"><!--DWLayoutEmptyCell-->&nbsp;</td>
         <!--td height="23" valign="middle">Internal Cost: </td-->
         <td height="1" colspan="2" valign="middle">
-            <input name="internal_cost"
+            <input name="internal_cost" style="background-color: red; color: white"
               <?php //jng
                 if ( $action <> "" ) {
                   //echo "VALUE=" . "\"$internal_cost\" readonly";
@@ -388,7 +388,7 @@ $row_teacher['teacher'] == $selected_teacher ) {echo "selected=\"selected\""; } 
 
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-            <input name="cost_type"
+            <input name="cost_type" style="background-color: red; color: white"
               <?php //jng
                 if ( $action <> "" ) {
                   //echo "VALUE=" . "\"$cost_type\" readonly";

@@ -73,3 +73,14 @@ Fixed add_classes.php:
   - teacher_select_rate.php
 - Updated checkform.js for check_student_form()
 - Fixed raymond's bugs in student_create_form.php
+
+[2018-10-29]
+- Implemented visibility control of "internal_cost" and "cost_type" for
+  class schedule management:
+  - class_schedule.php
+  - class_schedule_row_entry.php
+  - class_schedule_update.php
+  - class_schedule_update_row_entry.php
+- Updated checkform.js for check_class_schedule_form()
+- Made internal rate error messages more vague to prevent guessing of rates
+

@@ -88,20 +88,183 @@ do {
       </select></td>
       
 	  <td nowrap="nowrap">
-	  <input name="Rgrade<?php echo $j; ?>" <?php echo "VALUE=\"" . $grade . "\""; ?>
-	  type="text" id="Rgrade<?php echo $j; ?>" size="1" maxlength="4" onChange="this.style.backgroundColor='#FC9494'; if ( !( document.form2.reschedule_class<?php echo $j; ?>.checked)) { alert ('Please check the Reschedule CheckBox to confirm rescheduling')}" />
-	  <input name="Rext_rate<?php echo $j; ?>" <?php echo "VALUE=\"" . $extRate . "\""; ?> 
-	  type="text" id="Rext_rate<?php echo $j; ?>" size="4" maxlength="8" onChange='this.style.backgroundColor="#FC9494"; if (!(isPositiveNumber(this.value))) { alert("Please enter a number"); this.value = "<?php echo "$extRate"; ?>"}; if ( document.form2.Rcost_type<?php echo $j; ?>.value == "F" && parseFloat(document.form2.Rext_rate<?php echo $j; ?>.value) <= parseFloat(document.form2.Rcost<?php echo $j; ?>.value) ) { alert ("For Fixed Internal Cost, it must be less than External Rate")}; if ( !( document.form2.reschedule_class<?php echo $j; ?>.checked)) { alert ("Please check the Reschedule CheckBox to confirm rescheduling")}' /><br />
-      
-	  <input name="Rcost<?php echo $j; ?>" <?php echo "VALUE=\"" . $internalCost . "\""; ?> 
-	  type="text" id="Rcost<?php echo $j; ?>" size="4" maxlength="8" onChange='this.style.backgroundColor="#FC9494"; if (!(isPositiveNumber(this.value))) { alert("Please enter a number"); this.value = "<?php echo "$internalCost"; ?>"};  if ( document.form2.Rcost_type<?php echo $j; ?>.value == "F" && parseFloat(document.form2.Rext_rate<?php echo $j; ?>.value) <= parseFloat(this.value) ) { alert ("For fixed Internal Cost, it must be less than External Rate")}; if ( !( document.form2.reschedule_class<?php echo $j; ?>.checked)) { alert ("Please check the Reschedule CheckBox to confirm rescheduling")}' />
-      
-	  <input name="Rcost_type<?php echo $j; ?>" <?php echo "VALUE=\"" . $costType . "\""; ?> 
-	  type="text" id="Rcost_type<?php echo $j; ?>" size="1" maxlength="1" onChange='this.style.backgroundColor="#FC9494"; this.value=this.value.toUpperCase(); if ( this.value != "S" && this.value != "F" ) { alert("Please enter S or F"); this.value = "<?php echo "$costType"; ?>" }; if ( this.value == "F" && parseFloat(document.form2.Rext_rate<?php echo $j; ?>.value) <= parseFloat(document.form2.Rcost<?php echo $j; ?>.value) ) { alert ("For Fixed Internal Cost, it must be less than External Rate")}; if ( !( document.form2.reschedule_class<?php echo $j; ?>.checked)) { alert ("Please check the Reschedule CheckBox to confirm rescheduling")}' /></td>
-      
+	  <input name="Rgrade<?php echo $j; ?>"
+        <?php echo "VALUE=\"" . $grade . "\""; ?>
+	    type="text" id="Rgrade<?php echo $j; ?>" size="1" maxlength="4"
+        onChange="
+        // Grade
+        this.style.backgroundColor='#FC9494';
+        if ( !( document.form2.reschedule_class<?php echo $j; ?>.checked)) {
+          alert ('Please check the Reschedule CheckBox to confirm rescheduling');
+        }" />
+
+	  <input name="Rext_rate<?php echo $j; ?>"
+        <?php echo "VALUE=\"" . $extRate . "\""; ?>
+	    type="text" id="Rext_rate<?php echo $j; ?>" size="4" maxlength="8"
+        onChange='
+        // External Rate
+        this.style.backgroundColor="#FC9494";
+        if (!(isPositiveNumber(this.value))) {
+          alert("Please enter a positive number");
+          this.value = "<?php echo "$extRate"; ?>";
+        }
+
+        //Bjng
+        // User is changing external-cost, so get both the real internal-cost and cost-type values.
+        var real_cost_type = document.form2.Rcost_type<?php echo $j; ?>.value;
+        var cost_type_override = document.form2.Rcost_type_override<?php echo $j; ?>.value;
+
+        if (cost_type_override == "F" || cost_type_override == "S") {
+          real_cost_type = cost_type_override;
+        }
+
+        var real_internal_cost = parseFloat(document.form2.Rcost<?php echo $j; ?>.value);
+        var internal_cost_override = parseFloat(document.form2.Rcost_override<?php echo $j; ?>.value);
+
+        if (!isNaN(internal_cost_override)) {
+          real_internal_cost = internal_cost_override;
+        }
+        //Ejng
+
+        //if (document.form2.Rcost_type<?php echo $j; ?>.value == "F" &&
+        if (real_cost_type == "F" &&
+            parseFloat(document.form2.Rext_rate<?php echo $j; ?>.value) <= real_internal_cost) {
+            //parseFloat(document.form2.Rext_rate<?php echo $j; ?>.value) <= parseFloat(document.form2.Rcost<?php echo $j; ?>.value)) {
+          //alert ("Row Entry: For Fixed Internal Cost, it must be less than External Rate");
+          alert ("Invalid \"External Rate\".\n\nPlease check with School Admin.");  //jng
+        }
+        if ( !( document.form2.reschedule_class<?php echo $j; ?>.checked)) {
+          alert ("Please check the Reschedule CheckBox to confirm rescheduling");
+        }' />
+      <br />
+
+	  <input name="Rcost_override<?php echo $j; ?>" id="Rcost_override<?php echo $j; ?>"
+        type="text" size="4" maxlength="8"
+        <?php
+        //jng
+        if ($UserIsManager) {
+          echo "VALUE=\"" . $internalCost . "\"";
+        }
+        else {
+          // Can't use "disabled" attribute since it's not submitted with form
+          echo "VALUE=\"-\" readonly ";
+        }
+        ?>
+
+        onChange='
+        // Internal Cost override
+        this.style.backgroundColor="#FC9494";
+        if (!(isPositiveNumber(this.value))) {
+          alert("Please enter a positive number");
+          this.value = "<?php echo "$internalCost"; ?>";
+        }
+
+        //Bjng
+        // User is changing internal-cost-override, so get the real cost-type value.
+        var real_cost_type = document.form2.Rcost_type<?php echo $j; ?>.value;
+        var cost_type_override = document.form2.Rcost_type_override<?php echo $j; ?>.value;
+
+        if (cost_type_override == "F" || cost_type_override == "S") {
+          real_cost_type = cost_type_override;
+        }
+        //Ejng
+
+        //if (document.form2.Rcost_type<?php echo $j; ?>.value == "F" &&
+        if (real_cost_type == "F" &&
+            parseFloat(document.form2.Rext_rate<?php echo $j; ?>.value) <= parseFloat(this.value)) {
+          //alert ("For Fixed Internal Cost, it must be less than External Rate");
+          alert ("Invalid \"Internal Rate\".\n\nPlease check with School Admin.");  //jng
+        } else { // value == "S"
+          if (parseFloat(this.value) >= 100) {
+            alert ("Invalid \"Internal Split Rate\".\n\nPlease check with School Admin.");  //jng
+          }
+        }
+
+        if ( !( document.form2.reschedule_class<?php echo $j; ?>.checked)) {
+          alert ("Please check the Reschedule CheckBox to confirm rescheduling");
+        }' />
+
+	  <input name="Rcost_type_override<?php echo $j; ?>" id="Rcost_type_override<?php echo $j; ?>"
+        type="text" size="1" maxlength="1"
+
+        <?php
+        //jng
+        if ($UserIsManager) {
+          echo "VALUE=\"" . $costType . "\"";
+        }
+        else {
+          // Can't use "disabled" attribute since it's not submitted with form
+          echo "VALUE=\"-\" readonly ";
+        }
+        ?>
+
+        onChange='
+        // Cost Type override
+        this.style.backgroundColor="#FC9494";
+        this.value=this.value.toUpperCase();
+
+        //Bjng
+        // User is changing cost-type-override, so get the real internal-cost value.
+        var real_internal_cost = parseFloat(document.form2.Rcost<?php echo $j; ?>.value);
+        var internal_cost_override = parseFloat(document.form2.Rcost_override<?php echo $j; ?>.value);
+
+        if (!isNaN(internal_cost_override)) {
+          real_internal_cost = internal_cost_override;
+        }
+        //Ejng
+
+        if ( this.value != "S" && this.value != "F" ) {
+          alert("XPlease enter S or F");
+          this.value = "<?php echo "$costType"; ?>";
+        }
+        if ( this.value == "F" &&
+             parseFloat(document.form2.Rext_rate<?php echo $j; ?>.value) <= real_internal_cost ) {
+             //parseFloat(document.form2.Rext_rate<?php echo $j; ?>.value) <= parseFloat(document.form2.Rcost<?php echo $j; ?>.value) ) {
+          //alert ("For Fixed Internal Cost, it must be less than External Rate");
+          alert ("Invalid \"External Rate\".\n\nPlease check with School Admin.");  //jng
+        } else { // value == "S"
+          if (real_internal_cost >= 100) {
+            alert ("Invalid \"Internal Split Rate\".\n\nPlease check with School Admin.");  //jng
+          }
+        }
+
+        if ( !( document.form2.reschedule_class<?php echo $j; ?>.checked)) {
+          alert ("Please check the Reschedule CheckBox to confirm rescheduling");
+        }' />
+
+      <br>
+
+      <input type="text" readonly style="background-color: red; color: white"
+        name="Rcost<?php echo $j; ?>" id="Rcost<?php echo $j; ?>" size="4" maxlength="8"
+        <?php
+        echo "VALUE=\"" . $internalCost . "\"";
+        ?>
+      />
+
+      <input type="text" readonly style="background-color: red; color: white"
+        name="Rcost_type<?php echo $j; ?>" id="Rcost_type<?php echo $j; ?>" size="1" maxlength="1"
+        <?php
+        echo "VALUE=\"" . $costType . "\"";
+        ?>
+      />
+      </td>
+
 	  <td>
 	  <input name="Rremarks<?php echo $j; ?>" <?php echo "VALUE=\"" . $remarks . "\""; ?> 
-	  onChange='this.style.backgroundColor="#FC9494"; if ( !( document.form2.reschedule_class<?php echo $j; ?>.checked) && !( document.form2.cancel_class<?php echo $j; ?>.checked)) { alert ("You need to either check the Cancel Class or Reschedule Class Check Box")}; if ( this.value == "del" && ( <?php echo "\"$cancelReason\""; ?> != "" || <?php echo "\"$classType\""; ?> != "" )) { alert ("Cannot delete a cancelled or makeup class"); document.form2.reschedule_class<?php echo $j; ?>.checked = 0 }' type="text" id="Rremarks<?php echo $j; ?>" size="30" maxlength="100" onChange="this.style.backgroundColor='#FC9494';" />
+	    onChange='
+        // Remarks
+        this.style.backgroundColor="#FC9494";
+        if ( !( document.form2.reschedule_class<?php echo $j; ?>.checked) &&
+             !( document.form2.cancel_class<?php echo $j; ?>.checked)) {
+          alert ("You need to either check the Cancel Class or Reschedule Class Check Box");
+        }
+        if ( this.value == "del" && ( <?php echo "\"$cancelReason\""; ?> != "" ||
+             <?php echo "\"$classType\""; ?> != "" )) {
+          alert ("Cannot delete a cancelled or makeup class");
+          document.form2.reschedule_class<?php echo $j; ?>.checked = 0;
+        }'
+        type="text" id="Rremarks<?php echo $j; ?>" size="30" maxlength="100"
+        />
 	  <?php echo "$userName | $timestamp"; ?>
 	  </td>
     </tr>

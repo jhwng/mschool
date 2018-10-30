@@ -92,13 +92,15 @@ if ( isset($_REQUEST['getNextYear']) || isset($_REQUEST['getPrevYear']) ){
 if ( $action == "newcourse" ) {
   $student_id=$_GET['student_id'];
 //  echo "student_id = $student_id (from GET)<br>";
-  $home_tel=$_GET['home_tel'];
+  /*jng: home_tel, chequeno, and chequeholder become unset after updating schedule changes,
+         and coming back to class schedule page from "Back to Class Schedule" button. */
+  $home_tel= isset($_GET['home_tel']) ? $_GET['home_tel'] : ""; //jng
   $fullname=$_GET['fullname'];
   $coursename=$_GET['coursename'];
   $startdate=$_GET['startdate'];
   $enddate=$_GET['enddate'];
-  $chequeno=$_GET['chequeno'];
-  $chequeholder=$_GET['chequeholder'];
+  $chequeno= isset($_GET['chequeno']) ? $_GET['chequeno'] : ""; //jng
+  $chequeholder=isset($_GET['chequeholder']) ? $_GET['chequeholder'] : ""; //jng
 }
 if ( $action == "searchclasses" || $action == "getcourse" ) {
   $fullname=$_POST['full_name'];
@@ -734,10 +736,18 @@ echo '<table width="720" border="1"  cellspacing="0" cellpadding="0">
   // }	   
 
 /* Now create the form for all class entries */
-
-echo ' <form action="class_schedule_update.php" onSubmit="return check_class_schedule_form(this);" method="post" name="form2" id="form2">';
+//Bjng
+//echo ' <form action="class_schedule_update.php" onsubmit="return check_class_schedule_form(this);" method="post" name="form2" id="form2">';
+echo " <form action='class_schedule_update.php' onsubmit='return check_class_schedule_form(this, $UserIsManager);' method='post' name='form2' id='form2'>";
+/*
+if ($UserIsManager) {
+  echo ' <form action="class_schedule_update.php" onsubmit="return check_class_schedule_form(this, true);" method="post" name="form2" id="form2">';
+} else {
+  echo ' <form action="class_schedule_update.php" onsubmit="return check_class_schedule_form(this, false);" method="post" name="form2" id="form2">';
+}
+*/
+//Ejng
 echo '  <table width="1100" border="1" cellspacing="0" cellpadding="1">';
-
   
 //  echo "Number of Classes = " . $totalRows_classes . "<p>"; } 
 
@@ -750,6 +760,7 @@ echo '  <table width="1100" border="1" cellspacing="0" cellpadding="1">';
   $classCnt = 0;  // number of classes in each month
 
   if (isset($classes) && $classes != "") { // Do this only if $classes is set and not null //jng
+      //jng: this is where variables like $internalCost and $costType are extracted from the SQL query fetch result-set
       while (list ($fullName, $teacherName, $courseID, $cname, $grade, $classDate, $classTime, $duration, $cancelReason, $cancelTime, $extRate, $studentID, $teacherID, $remarks, $classID, $dow, $rescheduledFrom, $internalCost, $classType, $costType, $from_studentCreditID, $to_studentCreditID, $userID, $timestamp) = mysql_fetch_row($classes)) {
           $queryUser = "SELECT user_name as userName FROM user WHERE user_id = $userID";
           $resultUser = mysql_query($queryUser, $promusic) or die(mysql_error());
@@ -819,7 +830,7 @@ EOD;
           require('class_schedule_row_entry.php');
           $j += 1;
 
-          //jng -- bug in cancelReason <> "CXL" !! -- missing '$' in front of cancelReason
+          //jng -- fixed bug in cancelReason <> "CXL" !! -- missing '$' in front of cancelReason
           if ($cancelReason <> "W" && $cancelReason <> "T" && $cancelReason <> "CXL") $classCnt += 1;  // only count not cancelled entries
       }
   } // End $classes validity check //Ejng
@@ -872,58 +883,86 @@ EOD;
 </form>
 <?php
 if ( $action <> "" && $totalRows_classes > 0 ) {
-$impfullName = implode("|", $arr_fullName);
-echo "<script>document.form2.fullName.value=\"$impfullName\"; </script>";
-$impteacherName = implode("|", $arr_teacherName);
-echo "<script>document.form2.teacherName.value=\"$impteacherName\"; </script>";
-$impcourseID = implode("|", $arr_courseID);
-echo "<script>document.form2.courseID.value=\"$impcourseID\"; </script>";
-$impcourseName = implode("|", $arr_courseName);
-echo "<script>document.form2.courseName.value=\"$impcourseName\"; </script>";
-$impgrade = implode("|", $arr_grade);
-echo "<script>document.form2.grade.value=\"$impgrade\"; </script>";
-$impclassDate = implode("|", $arr_classDate);
-echo "<script>document.form2.classDate.value=\"$impclassDate\"; </script>";
-$impclassTime = implode("|", $arr_classTime);
-echo "<script>document.form2.classTime.value=\"$impclassTime\"; </script>";
-$impduration = implode("|", $arr_duration);
-echo "<script>document.form2.duration.value=\"$impduration\"; </script>";
-$impcancelReason = implode("|", $arr_cancelReason);
-echo "<script>document.form2.cancelReason.value=\"$impcancelReason\"; </script>";
-$impcancelTime = implode("|", $arr_cancelTime);
-echo "<script>document.form2.cancelTime.value=\"$impcancelTime\"; </script>";
-$impextRate = implode("|", $arr_extRate);
-echo "<script>document.form2.extRate.value=\"$impextRate\"; </script>";
-$impstudentID = implode("|", $arr_studentID);
-echo "<script>document.form2.studentID.value=\"$impstudentID\"; </script>";
-$impteacherID = implode("|", $arr_teacherID);
-echo "<script>document.form2.teacherID.value=\"$impteacherID\"; </script>";
-$impremarks = implode("|", $arr_remarks);
-echo "<script>document.form2.remarks.value=\"$impremarks\"; </script>";
-$impclassID = implode("|", $arr_classID);
-echo "<script>document.form2.classID.value=\"$impclassID\"; </script>";
-$impdow = implode("|", $arr_dow);
-echo "<script>document.form2.dow.value=\"$impdow\"; </script>";
-$imprescheduledFrom = implode("|", $arr_rescheduledFrom);
-echo "<script>document.form2.rescheduledFrom.value=\"$imprescheduledFrom\"; </script>";
-$impinternalCost = implode("|", $arr_internalCost);
-echo "<script>document.form2.internalCost.value=\"$impinternalCost\"; </script>";
-$impclassType = implode("|", $arr_classType);
-echo "<script>document.form2.classType.value=\"$impclassType\"; </script>";
-$impcostType = implode("|", $arr_costType);
-echo "<script>document.form2.costType.value=\"$impcostType\"; </script>";
-$impfromStudentCreditID = implode("|", $arr_fromStudentCreditID);
-echo "<script>document.form2.fromStudentCreditID.value=\"$impfromStudentCreditID\"; </script>";
-$imptoStudentCreditID = implode("|", $arr_toStudentCreditID);
-echo "<script>document.form2.toStudentCreditID.value=\"$imptoStudentCreditID\"; </script>";
-$impminuteBalance = implode("|", $arr_minuteBalance);
-echo "<script>document.form2.minuteBalance.value=\"$impminuteBalance\"; </script>";
-$impuserID = implode("|", $arr_userID);
-echo "<script>document.form2.userID.value=\"$impuserID\"; </script>";
-$impuserName = implode("|", $arr_userName);
-echo "<script>document.form2.userName.value=\"$impuserName\"; </script>";
-$imptimestamp = implode("|", $arr_timestamp);
-echo "<script>document.form2.timestamp.value=\"$imptimestamp\"; </script>";
+  /*jng: array implosion and explosion is for passing an array of form
+         values between class_schedule.php and class_schedule_update.php,
+         through the document.form2 javascript object. */
+  $impfullName = implode("|", $arr_fullName);
+  echo "<script>document.form2.fullName.value=\"$impfullName\"; </script>";
+
+  $impteacherName = implode("|", $arr_teacherName);
+  echo "<script>document.form2.teacherName.value=\"$impteacherName\"; </script>";
+
+  $impcourseID = implode("|", $arr_courseID);
+  echo "<script>document.form2.courseID.value=\"$impcourseID\"; </script>";
+
+  $impcourseName = implode("|", $arr_courseName);
+  echo "<script>document.form2.courseName.value=\"$impcourseName\"; </script>";
+
+  $impgrade = implode("|", $arr_grade);
+  echo "<script>document.form2.grade.value=\"$impgrade\"; </script>";
+
+  $impclassDate = implode("|", $arr_classDate);
+  echo "<script>document.form2.classDate.value=\"$impclassDate\"; </script>";
+
+  $impclassTime = implode("|", $arr_classTime);
+  echo "<script>document.form2.classTime.value=\"$impclassTime\"; </script>";
+
+  $impduration = implode("|", $arr_duration);
+  echo "<script>document.form2.duration.value=\"$impduration\"; </script>";
+
+  $impcancelReason = implode("|", $arr_cancelReason);
+  echo "<script>document.form2.cancelReason.value=\"$impcancelReason\"; </script>";
+
+  $impcancelTime = implode("|", $arr_cancelTime);
+  echo "<script>document.form2.cancelTime.value=\"$impcancelTime\"; </script>";
+
+  $impextRate = implode("|", $arr_extRate);
+  echo "<script>document.form2.extRate.value=\"$impextRate\"; </script>";
+
+  $impstudentID = implode("|", $arr_studentID);
+  echo "<script>document.form2.studentID.value=\"$impstudentID\"; </script>";
+
+  $impteacherID = implode("|", $arr_teacherID);
+  echo "<script>document.form2.teacherID.value=\"$impteacherID\"; </script>";
+
+  $impremarks = implode("|", $arr_remarks);
+  echo "<script>document.form2.remarks.value=\"$impremarks\"; </script>";
+
+  $impclassID = implode("|", $arr_classID);
+  echo "<script>document.form2.classID.value=\"$impclassID\"; </script>";
+
+  $impdow = implode("|", $arr_dow);
+  echo "<script>document.form2.dow.value=\"$impdow\"; </script>";
+
+  $imprescheduledFrom = implode("|", $arr_rescheduledFrom);
+  echo "<script>document.form2.rescheduledFrom.value=\"$imprescheduledFrom\"; </script>";
+
+  $impinternalCost = implode("|", $arr_internalCost);
+  echo "<script>document.form2.internalCost.value=\"$impinternalCost\"; </script>";
+
+  $impclassType = implode("|", $arr_classType);
+  echo "<script>document.form2.classType.value=\"$impclassType\"; </script>";
+
+  $impcostType = implode("|", $arr_costType);
+  echo "<script>document.form2.costType.value=\"$impcostType\"; </script>";
+
+  $impfromStudentCreditID = implode("|", $arr_fromStudentCreditID);
+  echo "<script>document.form2.fromStudentCreditID.value=\"$impfromStudentCreditID\"; </script>";
+
+  $imptoStudentCreditID = implode("|", $arr_toStudentCreditID);
+  echo "<script>document.form2.toStudentCreditID.value=\"$imptoStudentCreditID\"; </script>";
+
+  $impminuteBalance = implode("|", $arr_minuteBalance);
+  echo "<script>document.form2.minuteBalance.value=\"$impminuteBalance\"; </script>";
+
+  $impuserID = implode("|", $arr_userID);
+  echo "<script>document.form2.userID.value=\"$impuserID\"; </script>";
+
+  $impuserName = implode("|", $arr_userName);
+  echo "<script>document.form2.userName.value=\"$impuserName\"; </script>";
+
+  $imptimestamp = implode("|", $arr_timestamp);
+  echo "<script>document.form2.timestamp.value=\"$imptimestamp\"; </script>";
 }
 ?>
 
