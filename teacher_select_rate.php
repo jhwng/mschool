@@ -47,22 +47,44 @@ function variable_to_html($variable) {
 
 <script language="javascript">
 
-function setTeacherRateForClass(ext_rate, split, fixed, cost_type) {
+function setTeacherRateForClass(ext_rate, split, fixed, cost_type, isManager) {
   self.opener.document.form2.Rext_rate<?php echo $rowNum; ?>.value = ext_rate;
 
-  //if (isManager) {
-      if (cost_type == "S") {
-          self.opener.document.form2.Rcost<?php echo $rowNum; ?>.value = split;
-      }
-      else {
-          self.opener.document.form2.Rcost<?php echo $rowNum; ?>.value = fixed;
-      }
-      self.opener.document.form2.Rcost_type<?php echo $rowNum; ?>.value = cost_type;
-  //}
-  /*else {
-      self.opener.document.form2.Rcost<?php echo $rowNum; ?>.value = 0"-"
-      self.opener.document.form2.Rcost_type<?php echo $rowNum; ?>.value = "-";
-  }*/
+  //alert("isManager: " + isManager);
+
+  if (isManager) {
+    if (cost_type == "S") {
+      self.opener.document.form2.Rcost<?php echo $rowNum; ?>.value = split;
+      self.opener.document.form2.Rcost_override<?php echo $rowNum; ?>.value = split;
+    }
+    else {
+      self.opener.document.form2.Rcost<?php echo $rowNum; ?>.value = fixed;
+      self.opener.document.form2.Rcost_override<?php echo $rowNum; ?>.value = fixed;
+    }
+    self.opener.document.form2.Rcost_override<?php echo $rowNum; ?>.readOnly = false;
+
+    self.opener.document.form2.Rcost_type<?php echo $rowNum; ?>.value = cost_type;
+    self.opener.document.form2.Rcost_type_override<?php echo $rowNum; ?>.value = cost_type;
+    self.opener.document.form2.Rcost_type_override<?php echo $rowNum; ?>.readOnly = false;
+  }
+  else {
+    if (cost_type == "S") {
+      self.opener.document.form2.Rcost<?php echo $rowNum; ?>.value = split;
+    }
+    else {
+      self.opener.document.form2.Rcost<?php echo $rowNum; ?>.value = fixed;
+    }
+    self.opener.document.form2.Rcost_override<?php echo $rowNum; ?>.value = "-";
+    self.opener.document.form2.Rcost_override<?php echo $rowNum; ?>.readOnly = true;
+
+    self.opener.document.form2.Rcost_type<?php echo $rowNum; ?>.value = cost_type;
+    self.opener.document.form2.Rcost_type_override<?php echo $rowNum; ?>.value = "-";
+    self.opener.document.form2.Rcost_type_override<?php echo $rowNum; ?>.readOnly = true;
+  }
+
+  self.opener.document.form2.Rcost<?php echo $rowNum; ?>.readOnly = true;
+  self.opener.document.form2.Rcost_type<?php echo $rowNum; ?>.readOnly = true;
+
   window.close();
 }
 
@@ -70,38 +92,38 @@ function setTeacherRateStudent(ext_rate, split, fixed, cost_type, isManager) {
   self.opener.document.form1.ext_rate.value = ext_rate;
 
   if (isManager) {
-      if (cost_type == "S") {
-          self.opener.document.form1.internal_cost.value = split;
-          self.opener.document.form1.internal_cost_override.value = split;
-      }
-      else {
-          self.opener.document.form1.internal_cost.value = fixed;
-          self.opener.document.form1.internal_cost_override.value = fixed;
-      }
-      self.opener.document.form1.internal_cost_override.readOnly = false;
+    if (cost_type == "S") {
+      self.opener.document.form1.internal_cost.value = split;
+      self.opener.document.form1.internal_cost_override.value = split;
+    }
+    else {
+      self.opener.document.form1.internal_cost.value = fixed;
+      self.opener.document.form1.internal_cost_override.value = fixed;
+    }
+    self.opener.document.form1.internal_cost_override.readOnly = false;
 
-      self.opener.document.form1.cost_type.value = cost_type;
+    self.opener.document.form1.cost_type.value = cost_type;
 
-      self.opener.document.form1.cost_type_override.value = cost_type;
-      self.opener.document.form1.cost_type_override.readOnly = false;
+    self.opener.document.form1.cost_type_override.value = cost_type;
+    self.opener.document.form1.cost_type_override.readOnly = false;
   }
   else {
-      if (cost_type == "S") {
-          self.opener.document.form1.internal_cost.value = split;
-      }
-      else {
-          self.opener.document.form1.internal_cost.value = fixed;
-      }
-      self.opener.document.form1.internal_cost_override.value = "-";
+    if (cost_type == "S") {
+      self.opener.document.form1.internal_cost.value = split;
+    }
+    else {
+      self.opener.document.form1.internal_cost.value = fixed;
+    }
+    self.opener.document.form1.internal_cost_override.value = "-";
 
-      //jng - can't use "disabled" attribute since disabled input field
-      // is not submitted with the form. Use "readOnly" instead.
-      //self.opener.document.form1.internal_cost_override.disabled = true;
-      self.opener.document.form1.internal_cost_override.readOnly = true;
+    //jng - can't use "disabled" attribute since disabled input field
+    // is not submitted with the form. Use "readOnly" instead.
+    //self.opener.document.form1.internal_cost_override.disabled = true;
+    self.opener.document.form1.internal_cost_override.readOnly = true;
 
-      self.opener.document.form1.cost_type.value = cost_type;
-      self.opener.document.form1.cost_type_override.value = "-";
-      self.opener.document.form1.cost_type_override.readOnly = true;
+    self.opener.document.form1.cost_type.value = cost_type;
+    self.opener.document.form1.cost_type_override.value = "-";
+    self.opener.document.form1.cost_type_override.readOnly = true;
   }
 
   self.opener.document.form1.cost_type.readOnly = true;     //jng
@@ -114,19 +136,41 @@ function setTeacherRateStudent(ext_rate, split, fixed, cost_type, isManager) {
 function setTeacherRateForAddClasses(ext_rate, split, fixed, cost_type, isManager) {
   self.opener.document.courseform.ext_rate.value = ext_rate;
 
-    if (isManager) {
-        if (cost_type == "S") {
-            self.opener.document.courseform.internal_cost.value = split;
-        }
-        else {
-            self.opener.document.courseform.internal_cost.value = fixed;
-        }
-        self.opener.document.courseform.cost_type.value = cost_type;
+  if (isManager) {
+    if (cost_type == "S") {
+      self.opener.document.courseform.internal_cost.value = split;
+      self.opener.document.courseform.internal_cost_override.value = split;
     }
     else {
-        self.opener.document.courseform.internal_cost.value = "-"
-        self.opener.document.courseform.cost_type.value = "-";
+      self.opener.document.courseform.internal_cost.value = fixed;
+      self.opener.document.courseform.internal_cost_override.value = fixed;
     }
+    self.opener.document.courseform.internal_cost_override.readOnly = false;
+
+    self.opener.document.courseform.cost_type.value = cost_type;
+
+    self.opener.document.courseform.cost_type_override.value = cost_type;
+    self.opener.document.courseform.cost_type_override.readOnly = false;
+  }
+  else {
+    if (cost_type == "S") {
+      self.opener.document.courseform.internal_cost.value = split;
+    }
+    else {
+      self.opener.document.courseform.internal_cost.value = fixed;
+    }
+
+    self.opener.document.courseform.internal_cost_override.value = "-";
+    self.opener.document.courseform.internal_cost_override.readOnly = true;
+
+    self.opener.document.courseform.cost_type.value = cost_type;
+    self.opener.document.courseform.cost_type_override.value = "-";
+    self.opener.document.courseform.cost_type_override.readOnly = true;
+  }
+
+  self.opener.document.courseform.cost_type.readOnly = true;     //jng
+  self.opener.document.courseform.internal_cost.readOnly = true; //jng
+
   self.opener.document.courseform.time.focus();
   window.close();
 }
@@ -161,6 +205,15 @@ body {
       <td width="80" bgcolor="#FFCF9F" class="style10">Cost Type </td>
     </tr>
 <?php
+//jng: In the code below, where the PHP code "spits out" (ie, "echo") a string that calls
+//     a JS function (eg, setTeacherRateStudent()), passing in $UserIsManager of type true/false
+//     won't work because it's not a string, so we won't see a "true" or "false" being passed
+//     to the JS function. So we need to convert $UserIsManager to a string.
+$UserIsManagerStr="false";
+if ($UserIsManager) {
+    $UserIsManagerStr="true";
+}
+
 while (list($course, $category, $ext_rate, $split, $fixed, $type) = mysql_fetch_row($teacher_rates)) {
     //echo "from Page: $fromPage \n";//jng
 
@@ -172,19 +225,16 @@ while (list($course, $category, $ext_rate, $split, $fixed, $type) = mysql_fetch_
              onclick='window.location.href='<?php echo \"javascript: setTeacherRateStudent($ext_rate, $split, $fixed, '$type', $UserIsManager);\";?>''>
            $course</button></td>\n";
       */
-      $isManager=0;
-      if ($UserIsManager) {
-          $isManager=1;
-      }
+
       /*echo " <td><button class=\"class\"
            onclick=\"window.location.href=setTeacherRateStudent($ext_rate,$split,$fixed,\"$type\",$isManager);\">$course</button></td>\n" .
            " <td><button class=\"class\" onclick='window.location.href='> $category</button></td>\n";*/
 
         echo "<td><a href='javascript:void(0)'
-               onclick=\"window.location.href=setTeacherRateStudent($ext_rate,$split,$fixed,'$type',$isManager);\">$course</a>
+               onclick=\"window.location.href=setTeacherRateStudent($ext_rate,$split,$fixed,'$type',$UserIsManagerStr);\">$course</a>
               </td>\n" .
              "<td><a href='javascript:void(0)'
-               onclick=\"window . location . href = setTeacherRateStudent($ext_rate, $split, $fixed, '$type', $isManager);\">$category</a>
+               onclick=\"window . location . href = setTeacherRateStudent($ext_rate, $split, $fixed, '$type', $UserIsManagerStr);\">$category</a>
               </td>\n";
 
         //echo "  <td><a href=\"javascript: setTeacherRateStudent($ext_rate, $split, $fixed, '$type'); \">$course</a></td>\n" .
@@ -193,13 +243,13 @@ while (list($course, $category, $ext_rate, $split, $fixed, $type) = mysql_fetch_
 	//Ejng
 
 	if ( $fromPage == "classSchedule" ) {
-	  echo "  <td><a href=\"javascript: setTeacherRateForClass($ext_rate, $split, $fixed, '$type', $UserIsManager); \">$course</a></td>\n" .
-           "  <td><a href=\"javascript: setTeacherRateForClass($ext_rate, $split, $fixed, '$type'); \">$category</a></td>\n";
+	  echo "  <td><a href=\"javascript: setTeacherRateForClass($ext_rate, $split, $fixed, '$type', $UserIsManagerStr); \">$course</a></td>\n" .
+           "  <td><a href=\"javascript: setTeacherRateForClass($ext_rate, $split, $fixed, '$type', $UserIsManagerStr); \">$category</a></td>\n";
 	}
 
 	if ( $fromPage == "addClasses" ) {
-	  echo "  <td><a href=\"javascript: setTeacherRateForAddClasses($ext_rate, $split, $fixed, '$type', $UserIsManager); \">$course</a></td>\n" .
-           "  <td><a href=\"javascript: setTeacherRateForAddClasses($ext_rate, $split, $fixed, '$type', $UserIsManager); \">$category</a></td>\n";
+	  echo "  <td><a href=\"javascript: setTeacherRateForAddClasses($ext_rate, $split, $fixed, '$type', $UserIsManagerStr); \">$course</a></td>\n" .
+           "  <td><a href=\"javascript: setTeacherRateForAddClasses($ext_rate, $split, $fixed, '$type', $UserIsManagerStr); \">$category</a></td>\n";
 	}
 
 	if ($UserIsManager) {

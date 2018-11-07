@@ -124,6 +124,82 @@ function check_class_schedule_form(form, isManager) {
 	return true;
 }
 
+function check_costs(form, isManager) {
+    var ext_rate = parseFloat(form.ext_rate.value);
+    if ( isNaN(ext_rate) || ext_rate <= 0 ) {
+        alert('Invalid External Rate. Must be a numeric > 0');
+        form.ext_rate.focus();
+        return false;
+    }
+    var internal_cost = parseFloat(form.internal_cost.value);
+    var internal_cost_override = parseFloat(form.internal_cost_override.value); //jng
+
+    //jng
+    //if ( isNaN(internal_cost) || internal_cost <= 0 ) { alert('Invalid Internal Cost'); form.internal_cost.focus(); return false; }
+    if (!isManager && form.internal_cost.value == "" ||
+        (isNaN(internal_cost) && form.internal_cost.value != "") ||
+        internal_cost <= 0 ) {
+        alert('Invalid Internal Cost. Must be a numeric > 0');
+        form.internal_cost.focus();
+        return false;
+    }
+
+    //jng
+    if ( form.internal_cost_override.value != "-" &&
+        (isNaN(internal_cost_override) || internal_cost_override <= 0) ) {
+        alert('Invalid Internal Cost Override. Must be "-" or a numeric > 0');
+        form.internal_cost_override.focus();
+        return false;
+    }
+
+    //jng
+    //if (form.cost_type.value != "S" && form.cost_type.value != "F" ) { alert('Cost Type Must be "S" or "F"'); form.cost_type.focus(); return false; }
+    //if (form.cost_type.value != "-" && form.cost_type.value != "S" && form.cost_type.value != "F" ) {
+    if (!isManager && form.cost_type.value == "" ||
+        form.cost_type.value != "" && form.cost_type.value != "S" && form.cost_type.value != "F" ) {
+        alert('Cost Type Must be "S" or "F"');
+        form.cost_type.focus();
+        return false;
+    }
+
+    if (form.cost_type_override.value != "-" &&
+        form.cost_type_override.value != "S" && form.cost_type_override.value != "F" ) {
+        alert('Cost Type Override Must be "-", "S", or "F"');
+        form.cost_type_override.focus();
+        return false;
+    }
+
+    //jng
+    // If cost_type/cost_type_override == "F", check external rate <= internal_cost/internal_cost_override
+    var cost_type_check = form.cost_type_override.value;
+    if (cost_type_check == "-") {
+        cost_type_check = form.cost_type.value;
+    }
+
+    var internal_cost_check = parseFloat(form.internal_cost.value);
+    if (form.internal_cost_override.value != "-") {
+        internal_cost_check = parseFloat(form.internal_cost_override.value);
+    }
+
+    if (cost_type_check == "F") {
+        if (ext_rate <= internal_cost_check) {
+            //alert ("Invalid \"External Rate\":\nFor \"Fixed Cost Type\" it must be greater than \"Internal Cost\".\n\nPlease check with School Admin.");
+            alert ("Invalid \"External Rate\": Please check with School Admin.");
+            form.ext_rate.focus();
+            return false;
+        }
+    }
+    else if (cost_type_check == "S") {
+        if (internal_cost_check >= 100) {
+            alert("Invalid \"Internal Cost\":\nFor \"Split Cost Type\" it must be less than 100.");
+            form.internal_cost_override.focus();
+            return false;
+        }
+    }
+
+	return true;
+}
+
 function check_student_form(form, source, isManager) {
 	var fullname=form.full_name.value;
 	var pos=fullname.indexOf(",");

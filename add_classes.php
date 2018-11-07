@@ -39,7 +39,23 @@ if ( $action <> "" ) {
 	$grade=isset($_POST['grade']) ? $_POST['grade'] : "";
 	$external_rate=isset($_POST['ext_rate']) ? $_POST['ext_rate'] : "";
 	$internal_cost=isset($_POST['internal_cost']) ? $_POST['internal_cost'] : "";
-	$cost_type=isset($_POST['cost_type']) ? $_POST['cost_type'] : "";
+    $cost_type=isset($_POST['cost_type']) ? $_POST['cost_type'] : "";
+    $internal_cost_override=isset($_POST['internal_cost_override']) ? $_POST['internal_cost_override'] : $internal_cost;
+    $cost_type_override=isset($_POST['cost_type_override']) ? $_POST['cost_type_override'] : $cost_type;
+
+	//Bjng
+    $real_internal_cost=$internal_cost;
+    if ($internal_cost_override != "" && is_numeric($internal_cost_override)) {
+      $real_internal_cost = $internal_cost_override;
+    }
+
+    $real_cost_type=$cost_type;
+    if ($cost_type_override == "S" || $cost_type_override == "F") {
+      $real_cost_type = $cost_type_override;
+    }
+
+    //Ejng
+
     $time=isset($_POST['time']) ? $_POST['time'] : "";
     $duration=isset($_POST['duration']) ? $_POST['duration'] : "";
     $student_id=isset($_POST['student_id']) ? $_POST['student_id'] : "";
@@ -123,11 +139,25 @@ if ($action == 1 || $action == 4) { //Bjng
     $result = mysql_query($query, $promusic) or die(mysql_error());
     $row = mysql_fetch_array($result);
 
-    if ($row > 0) //jng
-        extract($row);
+    if ($row > 0) { //jng
+      extract($row);
+
+      //Bjng - initialize internal_cost_override & cost_type_override after extracting from query result.
+      if ($UserIsManager) {
+        $internal_cost_override = $internal_cost;
+        $cost_type_override = $cost_type;
+      }
+      else {
+        $internal_cost_override = "-";
+        $cost_type_override = "-";
+      }
+      //Ejng
+    }
   }
 } //Ejng
 ?>
+
+<script type="text/javascript" src="checkform.js"></script>
 
 <script>
 function getSelectedRadio(buttonGroup) {
@@ -145,7 +175,17 @@ function getSelectedRadio(buttonGroup) {
    return -1;
 } // Ends the "getSelectedRadio" function
 
-function checkAddClassFields (form) {
+//jng - function checkAddClassFields (form) {
+function checkAddClassFields (form, isManager) {
+
+   //Bjng
+   var rc = check_costs(form, isManager);
+
+   if (!rc) {
+       return false;
+   }
+   //Ejng
+
    // returns the value of the selected radio button or "" if no button is selected
    var i = getSelectedRadio(form.skip_holiday);
    var j = getSelectedRadio(form.details_update);
@@ -401,11 +441,19 @@ if ( $action == 2 ) {
 	  
         if ( $skipHoliday <> 1 || $isHoliday == 0 || ( $isHoliday == 1 && $skipHoliday == 0 ) ) 
 		{
-		  $query_class = "INSERT INTO class_schedule " .
+		  //jng - changed $internal_cost and $cost_type to $real_internal_cost and $real_cost_type
+		  /*$query_class = "INSERT INTO class_schedule " .
 		     "(student_id, course_id, grade, date, time, duration, teacher_id, " .
 			 "dow, internal_cost, cost_type, external_rate, user_id) " .
 			 "VALUES (\"$student_id\", \"$course_id\", \"$grade\", \"$cDate\", \"$time\", " .
-			 "$duration, \"$teacher_id\",\"$dow\", $internal_cost, \"$cost_type\", $external_rate, $thisUserID);";
+			 "$duration, \"$teacher_id\",\"$dow\", $internal_cost, \"$cost_type\", $external_rate, $thisUserID);";*/
+
+          $query_class = "INSERT INTO class_schedule " .
+            "(student_id, course_id, grade, date, time, duration, teacher_id, " .
+            "dow, internal_cost, cost_type, external_rate, user_id) " .
+            "VALUES (\"$student_id\", \"$course_id\", \"$grade\", \"$cDate\", \"$time\", " .
+            "$duration, \"$teacher_id\",\"$dow\", $real_internal_cost, \"$real_cost_type\", $external_rate, $thisUserID);";
+
           // echo $query_class . "<br>"; 
 		  $insert_class = mysql_query($query_class, $promusic) or die(mysql_error());
 		  $classCnt += 1;
@@ -422,12 +470,20 @@ if ( $action == 2 ) {
 	  {
         list($yyyy, $mm, $dd) = split('[/.-]', $addStartDate);
         $newDOW = date("w", mktime(12,0,0,$mm,$dd,$yyyy));
-		
-	    $query = "UPDATE student_registered_classes SET " .
+
+        //jng - changed $internal_cost and $cost_type to $real_internal_cost and $real_cost_type
+	    /*$query = "UPDATE student_registered_classes SET " .
                  "teacher_id=$teacher_id, end_date=\"$addEndDate\", " .
 	             "dow=$newDOW, time=\"$time\", duration=\"$duration\", grade=\"$grade\", " .
 	             "external_rate=$external_rate, internal_cost=$internal_cost, cost_type=\"$cost_type\" " .
-	             "WHERE student_id=$student_id AND course_id=$course_id AND school_year=\"$schYear\" ";
+	             "WHERE student_id=$student_id AND course_id=$course_id AND school_year=\"$schYear\" ";*/
+
+        $query = "UPDATE student_registered_classes SET " .
+                 "teacher_id=$teacher_id, end_date=\"$addEndDate\", " .
+                 "dow=$newDOW, time=\"$time\", duration=\"$duration\", grade=\"$grade\", " .
+                 "external_rate=$external_rate, internal_cost=$real_internal_cost, cost_type=\"$real_cost_type\" " .
+                 "WHERE student_id=$student_id AND course_id=$course_id AND school_year=\"$schYear\" ";
+
         // echo "$query<br>";
         $result = mysql_query($query, $promusic) or die(mysql_error());
 

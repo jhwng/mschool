@@ -67,7 +67,8 @@ Fixed add_classes.php:
   - teacher_group_lessons.php
 
 [2018-10-27]
-- Implemented visibility control of "internal_cost" and "cost_type" for:
+- Implemented visibility control of "internal_cost" and "cost_type" for
+  student-create/add-course:
   - student_create_2.php
   - student_create_form.php
   - teacher_select_rate.php
@@ -84,3 +85,14 @@ Fixed add_classes.php:
 - Updated checkform.js for check_class_schedule_form()
 - Made internal rate error messages more vague to prevent guessing of rates
 
+[2018-11-07]
+- Implemented visibility control of "internal_cost" and "cost_type" for
+  add-class:
+  - add_classes.php
+  - add_classes_courseform.php
+- Added check_costs() function to checkform.js
+- Fixed class_schedule_row_entry.php code formatting and other stuff
+- Fixed teacher_select_rate.php's internal_cost/cost_type for class management page
+
+
+TODO: refactor check_student_form() in checkform.js to use check_costs()
