@@ -94,5 +94,13 @@ Fixed add_classes.php:
 - Fixed class_schedule_row_entry.php code formatting and other stuff
 - Fixed teacher_select_rate.php's internal_cost/cost_type for class management page
 
+[2018-11-10]
+- Implemented visibility control of "internal_cost" and "cost_type" for
+  bulk-changes:
+  - bulk_changes.php
+  - bulk_changes_form.php
 
-TODO: refactor check_student_form() in checkform.js to use check_costs()
+- Refactored check_student_form() in checkform.js to use check_costs()
+- Fixed check_costs() in checkform.js
+- Updated check_costs() call in add_classes.php
+

@@ -16,27 +16,53 @@ $totalRows_teacher = mysql_num_rows($teacherList);
 // action = 3 - get course list only
 // action = 4 - retrieve  via GET
 
-$action=$_GET['action'];
+//Bjng
+// initialize vars
+$startdate = "";
+$fullname = "";
+$student_id="";
+$course_id="";
+$numRows=0;
+$holidayList="";
+//Ejng
+
+
+$action=isset($_GET['action']) ? $_GET['action'] : "";
 if ( $action <> "" ) {
   if ( $action <> 4 ) {
     $fullname=$_POST['full_name'];
-    $courseName=$_POST['course_name'];
+    $courseName=isset($_POST['course_name']) ? $_POST['course_name'] : "";
     $startdate=$_POST['start_date'];
     $enddate=$_POST['end_date'];
-	$grade=$_POST['grade'];
-	$external_rate=$_POST['ext_rate'];
-	$internal_cost=$_POST['internal_cost'];
-	$cost_type=$_POST['cost_type'];
-    $time=$_POST['time'];
-    $duration=$_POST['duration'];
+	$grade=isset($_POST['grade']) ? $_POST['grade'] : "";
+	$external_rate=isset($_POST['ext_rate']) ? $_POST['ext_rate'] : "";
+	$internal_cost=isset($_POST['internal_cost']) ? $_POST['internal_cost'] : "";
+	$cost_type=isset($_POST['cost_type']) ? $_POST['cost_type'] : "";
+    $time=isset($_POST['time']) ? $_POST['time'] : "";
+    $duration=isset($_POST['duration']) ? $_POST['duration'] : "";
     $student_id=$_POST['student_id'];
     $course_id=$_POST['course_id'];
-	$oldStartDate=$_POST['old_start_date'];
-	$newStartDate=$_POST['new_start_date'];
-	$remarks=$_POST['remarks'];
-	$teacher=$_POST['teacher'];
+	$oldStartDate=isset($_POST['old_start_date']) ? $_POST['old_start_date'] : "";
+	$newStartDate=isset($_POST['new_start_date']) ? $_POST['new_start_date'] : "";
+	$remarks=isset($_POST['remarks']) ? $_POST['remarks'] : "";
+	$teacher=isset($_POST['teacher']) ? $_POST['teacher'] : "";
 	$teacherName=$teacher;
-	$updateCourse=$_POST['details_update'];
+	$updateCourse=isset($_POST['details_update']) ? $_POST['details_update'] : "";
+
+    //Bjng
+    $internal_cost_override=isset($_POST['internal_cost_override']) ? $_POST['internal_cost_override'] : $internal_cost;
+    $cost_type_override=isset($_POST['cost_type_override']) ? $_POST['cost_type_override'] : $cost_type;
+
+    $real_internal_cost=$internal_cost;
+    if ($internal_cost_override != "" && is_numeric($internal_cost_override)) {
+      $real_internal_cost = $internal_cost_override;
+    }
+
+    $real_cost_type=$cost_type;
+    if ($cost_type_override == "S" || $cost_type_override == "F") {
+      $real_cost_type = $cost_type_override;
+    }
+    //Ejng
   }
   else {
     $fullname=$_GET['full_name'];
@@ -84,23 +110,38 @@ else {
 $schYear = $fromYear . "-" . $toYear;
 
 if ( $action == 1 || $action == 4 ) {
-  $query = "SELECT teacher.teacher as teacherName, student_registered_classes.grade, " .
-           "student_registered_classes.duration, student_registered_classes.time, " .
-		   "student_registered_classes.internal_cost, student_registered_classes.cost_type, " .
-		   "student_registered_classes.external_rate " .
-           "FROM teacher, student_registered_classes " . 
-		   "WHERE student_registered_classes.teacher_id=teacher.teacher_id " .
-		   "AND student_registered_classes.student_id=$student_id " .
-		   "AND student_registered_classes.course_id=$course_id " .
-		   "AND student_registered_classes.school_year=\"$schYear\";";
-  // echo "$query<br>";
-  $result = mysql_query($query, $promusic) or die(mysql_error());
-  $row = mysql_fetch_array($result);
-  extract($row);
+  //Bjng
+  if ( $course_id <> "" && $student_id <> "" && $schYear <> "" ) {
+      $query = "SELECT teacher.teacher as teacherName, student_registered_classes.grade, " .
+          "student_registered_classes.duration, student_registered_classes.time, " .
+          "student_registered_classes.internal_cost, student_registered_classes.cost_type, " .
+          "student_registered_classes.external_rate " .
+          "FROM teacher, student_registered_classes " .
+          "WHERE student_registered_classes.teacher_id=teacher.teacher_id " .
+          "AND student_registered_classes.student_id=$student_id " .
+          "AND student_registered_classes.course_id=$course_id " .
+          "AND student_registered_classes.school_year=\"$schYear\";";
+
+      // echo "$query<br>";
+      $result = mysql_query($query, $promusic) or die(mysql_error());
+      $row = mysql_fetch_array($result);
+
+      if ($row > 0) {
+          extract($row);
+
+          //Bjng - initialize internal_cost_override & cost_type_override after extracting from query result.
+          if ($UserIsManager) {
+              $internal_cost_override = $internal_cost;
+              $cost_type_override = $cost_type;
+          } else {
+              $internal_cost_override = "-";
+              $cost_type_override = "-";
+          }
+      }
+  }
+  //Ejng
 }
-
 ?>
-
 
 <script>
 function getSelectedRadio(buttonGroup) {
@@ -118,7 +159,32 @@ function getSelectedRadio(buttonGroup) {
    return -1;
 } // Ends the "getSelectedRadio" function
 
-function checkBulkChangesFields (form) {
+function checkBulkChangesFields (form, isManager) {
+   //Bjng
+   if (form.old_start_date.value == "" ||
+       !checkDateFormat(form, form.old_start_date)) {
+       alert ('Error: Missing or invalid \"Old Start Date\"');
+       return false;
+   }
+
+   if (form.new_start_date.value == "" ||
+       !checkDateFormat(form, form.new_start_date)) {
+       alert ('Error: Missing or invalid \"New Start Date\"');
+       return false;
+   }
+
+   if (form.time.value == "" || !checkTimeFormat(form, form.time)) {
+       alert ('Error: Missing or invalid class \"Time\"');
+       return false;
+   }
+
+   var rc = check_costs(form, true, isManager);
+
+   if (!rc) {
+      return false;
+   }
+   //Ejng
+
    // returns the value of the selected radio button or "" if no button is selected
    var j = getSelectedRadio(form.details_update);
    if ( j == -1 ) 
@@ -265,6 +331,23 @@ if ( $action <> 3 && $action <> "" ) {
 }
 
 if ( $action == 2 ) {
+      //Bjng
+      if ($oldStartDate == "") {
+          echo "<script>alert ('Error: missing \"Old Start Date\"')</script>";
+          die();
+      }
+
+      if ($newStartDate == "") {
+          echo "<script>alert ('Error: missing \"New Start Date\"')</script>";
+          die();
+      }
+
+      if ($time == "") {
+          echo "<script>alert ('Error: missing \"Time\"')</script>";
+          die();
+      }
+      //Ejng
+
       // get discount info
 	  $query = "SELECT discount, discount_expiry_date FROM student " .
 	           "WHERE student_id = $student_id;";
@@ -355,18 +438,20 @@ if ( $action == 2 ) {
 	   }
 		  
 	    if  ( $cTimeStamp <= $discountTimeStamp && $discount > 0 ) {
-		  $rate = $ext_rate * ( 100 - $discount) / 100;
+		  //$rate = $ext_rate * ( 100 - $discount) / 100; //jng - looks like ray's copy&paste bug from student_create_2.php!!
+          $rate = $external_rate * ( 100 - $discount) / 100;
 		}
 		else {
-		  $rate = $ext_rate;
+		  //$rate = $ext_rate; //jng - looks like ray's copy&paste bug from student_create_2.php!!
+          $rate = $external_rate;
 		}
-	  
+
     	if ( $isHoliday == 0 ) {
           $query_class = "INSERT INTO class_schedule " .
 		     "(student_id, course_id, grade, date, time, duration, teacher_id, " .
 			 "dow, internal_cost, cost_type, external_rate, remarks, user_id) " .
 			 "VALUES (\"$student_id\", \"$course_id\", \"$grade\", \"$cDate\", \"$time\", " .
-			 "$duration, \"$teacher_id\",\"$dow\", $internal_cost, \"$cost_type\", " .
+			 "$duration, \"$teacher_id\",\"$dow\", $real_internal_cost, \"$real_cost_type\", " .
 			 "$external_rate, \"$remarks\", $thisUserID );";
           // echo $query_class . "<br>"; 
 		  $insert_class = mysql_query($query_class, $promusic) or die(mysql_error());
@@ -388,7 +473,7 @@ if ( $action == 2 ) {
         $query = "UPDATE student_registered_classes SET " .
         "teacher_id=$teacher_id, end_date=\"$lastClassDate\", " .
 	    "dow=$dow, time=\"$time\", duration=\"$duration\", grade=\"$grade\", " .
-	    "external_rate=$external_rate, internal_cost=$internal_cost, cost_type=\"$cost_type\", " .
+	    "external_rate=$external_rate, internal_cost=$real_internal_cost, cost_type=\"$real_cost_type\", " .
 	    "remarks=\"$remarks\" " .
 	    "WHERE student_id=$student_id AND course_id=$course_id AND school_year=\"$schYear\" ";
         // echo "$query<br>";

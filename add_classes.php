@@ -40,10 +40,11 @@ if ( $action <> "" ) {
 	$external_rate=isset($_POST['ext_rate']) ? $_POST['ext_rate'] : "";
 	$internal_cost=isset($_POST['internal_cost']) ? $_POST['internal_cost'] : "";
     $cost_type=isset($_POST['cost_type']) ? $_POST['cost_type'] : "";
+
+    //Bjng
     $internal_cost_override=isset($_POST['internal_cost_override']) ? $_POST['internal_cost_override'] : $internal_cost;
     $cost_type_override=isset($_POST['cost_type_override']) ? $_POST['cost_type_override'] : $cost_type;
 
-	//Bjng
     $real_internal_cost=$internal_cost;
     if ($internal_cost_override != "" && is_numeric($internal_cost_override)) {
       $real_internal_cost = $internal_cost_override;
@@ -53,7 +54,6 @@ if ( $action <> "" ) {
     if ($cost_type_override == "S" || $cost_type_override == "F") {
       $real_cost_type = $cost_type_override;
     }
-
     //Ejng
 
     $time=isset($_POST['time']) ? $_POST['time'] : "";
@@ -179,7 +179,7 @@ function getSelectedRadio(buttonGroup) {
 function checkAddClassFields (form, isManager) {
 
    //Bjng
-   var rc = check_costs(form, isManager);
+   var rc = check_costs(form, false, isManager);
 
    if (!rc) {
        return false;

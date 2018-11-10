@@ -124,7 +124,7 @@ function check_class_schedule_form(form, isManager) {
 	return true;
 }
 
-function check_costs(form, isManager) {
+function check_costs(form, confirmWarning, isManager) {
     var ext_rate = parseFloat(form.ext_rate.value);
     if ( isNaN(ext_rate) || ext_rate <= 0 ) {
         alert('Invalid External Rate. Must be a numeric > 0');
@@ -136,35 +136,38 @@ function check_costs(form, isManager) {
 
     //jng
     //if ( isNaN(internal_cost) || internal_cost <= 0 ) { alert('Invalid Internal Cost'); form.internal_cost.focus(); return false; }
-    if (!isManager && form.internal_cost.value == "" ||
-        (isNaN(internal_cost) && form.internal_cost.value != "") ||
-        internal_cost <= 0 ) {
-        alert('Invalid Internal Cost. Must be a numeric > 0');
+    if (//!isManager && form.internal_cost.value == "" || //jng - don't remember why I added this condition for... doesn't seem to make any sense
+        //(isNaN(internal_cost) && form.internal_cost.value != "") || //jng - don't remember why internal_cost can be "" either...
+        isNaN(internal_cost) || internal_cost <= 0 ) {
+        alert('Invalid database "Internal Cost". Must be a numeric > 0');
         form.internal_cost.focus();
         return false;
     }
 
-    //jng
-    if ( form.internal_cost_override.value != "-" &&
-        (isNaN(internal_cost_override) || internal_cost_override <= 0) ) {
-        alert('Invalid Internal Cost Override. Must be "-" or a numeric > 0');
+    //jng - for Manager-user internal_cost_override cannot be "-", it must be a numeric.
+    if ((isManager && isNaN(internal_cost_override)) ||
+		(form.internal_cost_override.value != "-" &&
+         (isNaN(internal_cost_override) || internal_cost_override <= 0))) {
+        alert('Invalid "Internal Cost". Must be a numeric > 0');
         form.internal_cost_override.focus();
         return false;
     }
 
-    //jng
     //if (form.cost_type.value != "S" && form.cost_type.value != "F" ) { alert('Cost Type Must be "S" or "F"'); form.cost_type.focus(); return false; }
     //if (form.cost_type.value != "-" && form.cost_type.value != "S" && form.cost_type.value != "F" ) {
-    if (!isManager && form.cost_type.value == "" ||
-        form.cost_type.value != "" && form.cost_type.value != "S" && form.cost_type.value != "F" ) {
-        alert('Cost Type Must be "S" or "F"');
+    if (//!isManager && form.cost_type.value == "" || //jng - don't remember why cost_type can be "" for Manager...
+        //form.cost_type.value != "" && form.cost_type.value != "S" && form.cost_type.value != "F" ) {
+		(form.cost_type.value != "S" && form.cost_type.value != "F")) {
+        alert('Invalid database "Cost Type". Must be "S" or "F"');
         form.cost_type.focus();
         return false;
     }
 
-    if (form.cost_type_override.value != "-" &&
-        form.cost_type_override.value != "S" && form.cost_type_override.value != "F" ) {
-        alert('Cost Type Override Must be "-", "S", or "F"');
+    //jng - for Manager-user cost_type_override should NOT be "-".
+    if ((isManager && form.cost_type_override.value == "-" ) ||
+		(form.cost_type_override.value != "-" &&
+         form.cost_type_override.value != "S" && form.cost_type_override.value != "F")) {
+        alert('Invalid "Cost Type". Must be "S", or "F"');
         form.cost_type_override.focus();
         return false;
     }
@@ -172,28 +175,45 @@ function check_costs(form, isManager) {
     //jng
     // If cost_type/cost_type_override == "F", check external rate <= internal_cost/internal_cost_override
     var cost_type_check = form.cost_type_override.value;
-    if (cost_type_check == "-") {
+    if (cost_type_check == "-" ||
+		(cost_type_check != "F" && cost_type_check != "S")) {
         cost_type_check = form.cost_type.value;
     }
 
-    var internal_cost_check = parseFloat(form.internal_cost.value);
-    if (form.internal_cost_override.value != "-") {
-        internal_cost_check = parseFloat(form.internal_cost_override.value);
+    var internal_cost_check = internal_cost;
+    if (!isNaN(internal_cost_override)) { // if internal_cost_override is a numeric
+        internal_cost_check = internal_cost_override;
     }
 
     if (cost_type_check == "F") {
         if (ext_rate <= internal_cost_check) {
             //alert ("Invalid \"External Rate\":\nFor \"Fixed Cost Type\" it must be greater than \"Internal Cost\".\n\nPlease check with School Admin.");
-            alert ("Invalid \"External Rate\": Please check with School Admin.");
-            form.ext_rate.focus();
-            return false;
+            if (confirmWarning) {
+              if (!confirm("WARNING: Abnormal \"External Rate\".\n\nContinue?")) {
+                form.ext_rate.focus();
+                return false;
+              }
+            }
+            else {
+              alert("WARNING: Abnormal \"External Rate\".\n\nPlease check with School Admin.");
+              form.ext_rate.focus();
+              return false;
+            }
         }
     }
     else if (cost_type_check == "S") {
         if (internal_cost_check >= 100) {
-            alert("Invalid \"Internal Cost\":\nFor \"Split Cost Type\" it must be less than 100.");
-            form.internal_cost_override.focus();
-            return false;
+            if (confirmWarning) {
+                if (!confirm("WARNING: Abnormal \"Internal Cost\":\nFor \"Split Cost Type\" it should be less than 100.\n\nContinue?")) {
+                    form.internal_cost_override.focus();
+                    return false;
+			    }
+            }
+            else {
+                alert("WARNING: Abnormal \"Internal Cost\":\nFor \"Split Cost Type\" it should be less than 100.\n\nPlease check with School Admin.");
+                form.internal_cost_override.focus();
+                return false;
+            }
         }
     }
 
@@ -231,77 +251,11 @@ function check_student_form(form, source, isManager) {
     
     if ( source == "create" ) {
 	  if (form.course_name.value != "None" ) {
-	    var ext_rate = parseFloat(form.ext_rate.value);
-	    if ( isNaN(ext_rate) || ext_rate <= 0 ) {
-	      alert('Invalid External Rate. Must be a numeric > 0');
-	      form.ext_rate.focus();
-	      return false;
-	    }
-
-	    var internal_cost = parseFloat(form.internal_cost.value);
-	    var internal_cost_override = parseFloat(form.internal_cost_override.value); //jng
-
-	    //jng
-        //if ( isNaN(internal_cost) || internal_cost <= 0 ) { alert('Invalid Internal Cost'); form.internal_cost.focus(); return false; }
-        if (!isManager && form.internal_cost.value == "" ||
-			(isNaN(internal_cost) && form.internal_cost.value != "") ||
-			internal_cost <= 0 ) {
-	      alert('Invalid Internal Cost. Must be a numeric > 0');
-	      form.internal_cost.focus();
-	      return false;
-	    }
-
-	    //jng
-        if ( form.internal_cost_override.value != "-" &&
-		     (isNaN(internal_cost_override) || internal_cost_override <= 0) ) {
-          alert('Invalid Internal Cost Override. Must be "-" or a numeric > 0');
-          form.internal_cost_override.focus();
-          return false;
-        }
-
-	    //jng
-	    //if (form.cost_type.value != "S" && form.cost_type.value != "F" ) { alert('Cost Type Must be "S" or "F"'); form.cost_type.focus(); return false; }
-        //if (form.cost_type.value != "-" && form.cost_type.value != "S" && form.cost_type.value != "F" ) {
-        if (!isManager && form.cost_type.value == "" ||
-            form.cost_type.value != "" && form.cost_type.value != "S" && form.cost_type.value != "F" ) {
-	      alert('Cost Type Must be "S" or "F"');
-	      form.cost_type.focus();
-	      return false;
-	    }
-
-        if (form.cost_type_override.value != "-" &&
-		    form.cost_type_override.value != "S" && form.cost_type_override.value != "F" ) {
-          alert('Cost Type Override Must be "-", "S", or "F"');
-          form.cost_type_override.focus();
-          return false;
-        }
 
         //jng
-		// If cost_type/cost_type_override == "F", check external rate <= internal_cost/internal_cost_override
-		var cost_type_check = form.cost_type_override.value;
-        if (cost_type_check == "-") {
-          cost_type_check = form.cost_type.value;
-		}
-
-        var internal_cost_check = parseFloat(form.internal_cost.value);
-        if (form.internal_cost_override.value != "-") {
-          internal_cost_check = parseFloat(form.internal_cost_override.value);
-        }
-
-        if (cost_type_check == "F") {
-		  if (ext_rate <= internal_cost_check) {
-            //alert ("Invalid \"External Rate\":\nFor \"Fixed Cost Type\" it must be greater than \"Internal Cost\".\n\nPlease check with School Admin.");
-            alert ("Invalid \"External Rate\": Please check with School Admin.");
-            form.ext_rate.focus();
-            return false;
-		  }
-		}
-		else if (cost_type_check == "S") {
-          if (internal_cost_check >= 100) {
-            alert("Invalid \"Internal Cost\":\nFor \"Split Cost Type\" it must be less than 100.");
-            form.internal_cost_override.focus();
-            return false;
-          }
+        var costIsValid = check_costs(form, false, isManager);
+        if (costIsValid == false) {
+          return false;
 		}
 
 	    var thisTime = document.form1.time;

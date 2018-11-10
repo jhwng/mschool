@@ -1,5 +1,5 @@
       </form>
-      <form id="courseform" name="courseform" method="post" action="bulk_changes.php?action=2" onsubmit="return checkBulkChangesFields(this);">
+      <form id="courseform" name="courseform" method="post" action="bulk_changes.php?action=2" onsubmit="return checkBulkChangesFields(this, <?php if ($UserIsManager) echo "true"; else echo "false" ?>);">
         <table width="772" border="0" cellspacing="0" cellpadding="0">
           <tr>
             <td height="25">&nbsp;</td>
@@ -64,31 +64,100 @@ $row_teacher['teacher'] == $teacherName ) {echo "selected=\"selected\""; } ?>><?
           <tr>
             <td height="25">&nbsp;</td>
             <td align="left">External Rate: </td>
-            <td align="left"><input name="ext_rate" 
-	  <?php if ( $action <> "" ) {echo "VALUE=" . "\"$external_rate\""; } ?>
-	  type="text" id="ext_rate" size="6" maxlength="6" />
+            <td align="left">
+              <input name="ext_rate"
+                onchange='check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);'
+	            <?php if ( $action <> "" ) {echo "VALUE=" . "\"$external_rate\""; } ?>
+                type="text" id="ext_rate" size="6" maxlength="6" />
               <span class="bluetext">( per 15 minutes, before discount ) </span></td>
           </tr>
           <tr>
             <td height="25">&nbsp;</td>
             <td align="left">Internal Cost: </td>
-            <td align="left"><input name="internal_cost" 
-	  <?php if ( $action <> "" ) {echo "VALUE=" . "\"$internal_cost\""; } ?>
-	  type="text" id="internal_cost" size="6" maxlength="6" />
+            <td align="left">
+              <input name="internal_cost_override"
+                onchange='check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);'
+                <?php
+                /*if ( $action <> "" ) {echo "VALUE=" . "\"$internal_cost\""; }*/
+                if ( $action <> "" ) {
+                  if ($UserIsManager) {
+                    echo "VALUE=" . "\"$internal_cost_override\"";
+                  }
+                  else {
+                    //jng - can't use "disabled" attribute since it's not submitted with form
+                    echo "VALUE=\"-\" readonly";
+                  }
+                }
+                ?>
+                type="text" id="internal_cost_override" size="6" maxlength="6" />
 &nbsp;&nbsp;Cost Type:
-<input name="cost_type"
+<input name="cost_type_override"
   onchange='this.value=this.value.toUpperCase();
-  if (this.value != "S" && this.value != "F") {
-    alert("Please enter S or F");
-  }
-  if (this.value == "F" &&
+    check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);
+
+    // Covered by check_costs() already.
+    /*if (this.value != "S" && this.value != "F") {
+      alert("Please enter S or F");
+    }
+    if (this.value == "F" &&
       parseFloat(document.courseform.ext_rate<?php if (isset($j)) echo $j; ?>.value) <= parseFloat(document.courseform.internal_cost<?php if (isset($j)) echo $j; ?>.value)) {
-    alert ("For Fixed Internal Cost, it must be less than External Rate");
-  }'
-  <?php if ( $action <> "" ) {echo "VALUE=" . "\"$cost_type\""; } ?>
-  type="text" id="cost_type" size="4" maxlength="4"
+      alert ("For Fixed Internal Cost, it must be less than External Rate");
+    }*/'
+    <?php
+    if ( $action <> "" ) {
+      if ($UserIsManager) {
+        echo "VALUE=" . "\"$cost_type_override\"";
+      }
+      else {
+        echo "VALUE=\"-\" readonly";
+      }
+    }
+    //if ( $action <> "" ) {echo "VALUE=" . "\"$cost_type\""; }
+    ?>
+    type="text" id="cost_type_override" size="4" maxlength="4"
 />
 <span class="bluetext"> ( S or F ) </span></td>
+          </tr>
+          <tr>
+            <td colspan="2" valign="middle"><!--DWLayoutEmptyCell-->&nbsp;</td>
+            <!--td height="23" valign="middle">Internal Cost: </td-->
+            <td colspan="2" valign="middle">
+              <input name="internal_cost" style="background-color: red; color: white"
+                <?php //jng
+                if ( $action <> "" ) {
+                  //echo "VALUE=" . "\"$internal_cost\" readonly";
+                  echo "VALUE=" . "\"$internal_cost\"";
+                }
+                /*else {
+                  if (!$UserIsManager) {
+                    //echo "VALUE=\"-\" readonly";
+                    echo "VALUE=\"-\"";
+                  }
+                }*/
+                echo " readonly";
+                ?>
+                type="text"
+                id="internal_cost" size="6" maxlength="6" />
+
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+              <input name="cost_type" style="background-color: red; color: white"
+                <?php //jng
+                if ( $action <> "" ) {
+                  //echo "VALUE=" . "\"$cost_type\" readonly";
+                  echo "VALUE=" . "\"$cost_type\"";
+                }
+                /*else {
+                  if (!$UserIsManager) {
+                    //echo "VALUE=\"-\" readonly";
+                    echo "VALUE=\"-\"";
+                  }
+                }*/
+                echo " readonly";
+                ?>
+                type="text"
+                id="cost_type" size="4" maxlength="4" />
+            </td>
           </tr>
           <tr>
             <td height="25">&nbsp;</td>
