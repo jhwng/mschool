@@ -42,6 +42,21 @@ if ( $action <> "" ) {
     $teacher=isset($_POST['teacher']) ? $_POST['teacher'] : "";
     $dow=isset($_POST['dow']) ? $_POST['dow'] : "";
     $status=isset($_POST['status']) ? $_POST['status'] : "";  //Ejng
+
+    //Bjng
+    $internal_cost_override=isset($_POST['internal_cost_override']) ? $_POST['internal_cost_override'] : $internal_cost;
+    $cost_type_override=isset($_POST['cost_type_override']) ? $_POST['cost_type_override'] : $cost_type;
+
+    $real_internal_cost=$internal_cost;
+    if ($internal_cost_override != "" && is_numeric($internal_cost_override)) {
+      $real_internal_cost = $internal_cost_override;
+    }
+
+    $real_cost_type=$cost_type;
+    if ($cost_type_override == "S" || $cost_type_override == "F") {
+      $real_cost_type = $cost_type_override;
+    }
+    //Ejng
   }
   else {
     $fullname=$_GET['full_name'];
@@ -59,7 +74,6 @@ if ( $action <> "" ) {
     extract($row);
   }
 }
-
 
 if ( $startdate == "" ) {
    $curMth = date("m");
@@ -108,7 +122,20 @@ if ( $action == 1 || $action == 4 ) {
         // echo "$query<br>";
         $result = mysql_query($query, $promusic) or die(mysql_error());
         $row = mysql_fetch_array($result);
-        extract($row);
+
+        // Bjng - mysql_fetch_array() returns false if there's no row
+        if ($row) {
+          extract($row);
+
+          // initialize internal_cost_override & cost_type_override after extracting from query result.
+          if ($UserIsManager) {
+            $internal_cost_override = $internal_cost;
+            $cost_type_override = $cost_type;
+          } else {
+            $internal_cost_override = "-";
+            $cost_type_override = "-";
+          }
+        } //Ejng
     } //Ejng
 }
 
@@ -245,7 +272,7 @@ if ( $action <> 3 && $action <> "" ) {
 }
 
 if ( $action == 2 ) {
-	  
+
   // get teacher_id
   $query = "SELECT teacher_id FROM teacher " .
            "WHERE teacher = \"$teacher\";";
@@ -253,18 +280,18 @@ if ( $action == 2 ) {
   $result = mysql_query($query, $promusic) or die(mysql_error());
   $row = mysql_fetch_array($result);
   extract($row);
-  
-  $query = "UPDATE student_registered_classes SET " .
-    "teacher_id=$teacher_id, start_date=\"$fromDate\", end_date=\"$toDate\", " .
-	"dow=$dow, time=\"$time\", duration=\"$duration\", grade=\"$grade\", " .
-	"external_rate=$external_rate, internal_cost=$internal_cost, cost_type=\"$cost_type\", " .
-	"status=\"$status\", remarks=\"$remarks\" " .
-	"WHERE student_id=$student_id AND course_id=$course_id AND school_year=\"$schYear\" ";
-  // echo "$query<br>";
-  $result = mysql_query($query, $promusic) or die(mysql_error());
-  echo "<script>alert ('Student course details have been updated')</script>";
-	  
 
+  if ($row) {
+      $query = "UPDATE student_registered_classes SET " .
+          "teacher_id=$teacher_id, start_date=\"$fromDate\", end_date=\"$toDate\", " .
+          "dow=$dow, time=\"$time\", duration=\"$duration\", grade=\"$grade\", " .
+          "external_rate=$external_rate, internal_cost=$real_internal_cost, cost_type=\"$real_cost_type\", " .
+          "status=\"$status\", remarks=\"$remarks\" " .
+          "WHERE student_id=$student_id AND course_id=$course_id AND school_year=\"$schYear\" ";
+      // echo "$query<br>";
+      $result = mysql_query($query, $promusic) or die(mysql_error());
+      echo "<script>alert ('Student course details have been updated')</script>";
+  }
 }   // end action = 2
 
 ?>

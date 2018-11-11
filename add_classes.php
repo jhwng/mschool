@@ -27,6 +27,9 @@ $courseName="";
 $course_id="";
 $numRows=0;
 $holidayList="";
+$skipHoliday="";
+$updateCourse="";
+
 //Ejng
 
 $action= isset($_GET['action']) ? $_GET['action'] : "";

@@ -1,6 +1,15 @@
 <?php include "auth_inc.php"; ?>
 <?php require_once('Connections/promusic.php'); ?>
 <?php
+
+//Bjng
+$startdate="";
+$fullname="";
+$course_id="";
+$student_id="";
+$numRows=0;
+//Ejng
+
 mysql_select_db($database_promusic, $promusic);
 $query_teacher = "SELECT teacher FROM teacher where active = 'Y' or active is NULL or active = '' ORDER BY teacher";
 $teacherList = mysql_query($query_teacher, $promusic) or die(mysql_error());
@@ -12,26 +21,26 @@ $totalRows_teacher = mysql_num_rows($teacherList);
 // action = 3 - get course list only
 // action = 4 - retrieve  via GET
 
-$action=$_GET['action'];
+$action=isset($_GET['action']) ? $_GET['action'] : "";
 if ( $action <> "" ) {
   if ( $action <> 4 ) {
     $fullname=$_POST['full_name'];
     $courseName=$_POST['course_name'];
     $startdate=$_POST['start_date'];
     $enddate=$_POST['end_date'];
-	$grade=$_POST['grade'];
-	$external_rate=$_POST['ext_rate'];
-	$internal_cost=$_POST['internal_cost'];
-	$cost_type=$_POST['cost_type'];
-    $time=$_POST['time'];
-    $duration=$_POST['duration'];
+	$grade=isset($_POST['grade']) ? $_POST['grade'] : "";
+	$external_rate=isset($_POST['ext_rate']) ? $_POST['ext_rate'] : "";
+	$internal_cost=isset($_POST['internal_cost']) ? $_POST['internal_cost'] : "";
+	$cost_type=isset($_POST['cost_type']) ? $_POST['cost_type'] : "";
+    $time=isset($_POST['time']) ? $_POST['time'] : "";
+    $duration=isset($_POST['duration']) ? $_POST['duration'] : "";
     $student_id=$_POST['student_id'];
     $course_id=$_POST['course_id'];
-	$lastDate=$_POST['last_date'];
-	$remarks=$_POST['remarks'];
-	$teacher=$_POST['teacher'];
-	$dow=$_POST['dow'];
-	$status=$_POST['status'];
+	$lastDate=isset($_POST['last_date']) ? $_POST['last_date'] : "";
+	$remarks=isset($_POST['remarks']) ? $_POST['remarks'] : "";
+	$teacher=isset($_POST['teacher']) ? $_POST['teacher'] : "";
+	$dow=isset($_POST['dow']) ? $_POST['dow'] : "";
+	$status=isset($_POST['status']) ? $_POST['status'] : "";
   }
   else {
     $fullname=$_GET['full_name'];
@@ -49,7 +58,6 @@ if ( $action <> "" ) {
   extract($row);
   }
 }
-
 
 if ( $startdate == "" ) {
    $curMth = date("m");
@@ -94,7 +102,11 @@ if ( $action == 1 || $action == 4 ) {
   // echo "$query<br>";
   $result = mysql_query($query, $promusic) or die(mysql_error());
   $row = mysql_fetch_array($result);
-  extract($row);
+
+  // Bjng - mysql_fetch_array() returns false if there's no row
+  if ($row) {
+    extract($row);
+  } //Ejng
 }
 
 ?>

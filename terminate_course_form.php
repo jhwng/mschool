@@ -70,20 +70,43 @@ $row_teacher['teacher'] == $teacher ) {echo "selected=\"selected\""; } ?>><?php 
           <tr>
             <td height="25">&nbsp;</td>
             <td align="left">External Rate: </td>
-            <td align="left"><input name="ext_rate" 
-	  <?php if ( $action <> "" ) {echo "VALUE=" . "\"$external_rate\""; } ?>
-	  type="text" id="ext_rate" size="6" maxlength="6" /></td>
+            <td align="left">
+              <input name="ext_rate"
+                <?php
+                if ( $action <> "" ) {
+                  echo "VALUE=" . "\"$external_rate\"";
+                  echo "readonly";
+                } ?>
+                type="text" id="ext_rate" size="6" maxlength="6" /></td>
           </tr>
           <tr>
             <td height="25">&nbsp;</td>
             <td align="left">Internal Cost: </td>
-            <td align="left"><input name="internal_cost" 
-	  <?php if ( $action <> "" ) {echo "VALUE=" . "\"$internal_cost\""; } ?>
-	  type="text" id="internal_cost" size="6" maxlength="6" />
+            <td align="left">
+              <input name="internal_cost"
+                <?php
+                if ( $action <> "" ) {
+                  if ($UserIsManager) {
+                      echo "VALUE=" . "\"$internal_cost\"";
+                  }
+                  else {
+                      echo "VALUE=\"-\"";
+                  }
+                  echo "readonly";
+                } ?>
+                type="text" id="internal_cost" size="6" maxlength="6" />
 &nbsp;&nbsp;Cost Type:
-<input name="cost_type" onchange='this.value=this.value.toUpperCase(); if ( this.value != "S" && this.value != "F" ) { alert("Please enter S or F")}; if ( this.value == "F" && parseFloat(document.courseform.ext_rate<?php if (isset($j)) echo $j; ?>.value) <= parseFloat(document.courseform.internal_cost<?php if (isset($j)) echo $j; ?>.value) ) { alert ("For Fixed Internal Cost, it must be less than External Rate")}'
-  <?php if ( $action <> "" ) {echo "VALUE=" . "\"$cost_type\""; } ?>
-  type="text" id="cost_type" size="4" maxlength="4" />
+<input name="cost_type"
+    <?php if ( $action <> "" ) {
+        if ($UserIsManager) {
+            echo "VALUE=" . "\"$cost_type\"";
+        }
+        else {
+            echo "VALUE=\"-\"";
+        }
+        echo "readonly";
+    } ?>
+    type="text" id="cost_type" size="4" maxlength="4" />
 <span class="bluetext"> ( S or F ) </span></td>
           </tr>
           <tr>

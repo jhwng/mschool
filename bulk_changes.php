@@ -24,6 +24,10 @@ $student_id="";
 $course_id="";
 $numRows=0;
 $holidayList="";
+$oldStartDate="";
+$newStartDate="";
+$remarks="";
+$updateCourse="";
 //Ejng
 
 
