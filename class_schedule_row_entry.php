@@ -272,7 +272,7 @@
             parseFloat(document.form2.Rext_rate<?php echo $j; ?>.value) <= real_internal_cost) {
             //parseFloat(document.form2.Rext_rate<?php echo $j; ?>.value) <= parseFloat(document.form2.Rcost<?php echo $j; ?>.value)) {
           //alert ("Row Entry: For Fixed Internal Cost, it must be less than External Rate");
-          alert ("Invalid \"External Rate\".\n\nPlease check with School Admin.");  //jng
+          alert ("WARNING: Abnormal \"External Rate\".\n\nPlease check with School Admin.");  //jng
         }
         if ( !( document.form2.reschedule_class<?php echo $j; ?>.checked)) {
           alert ("Please check the Reschedule CheckBox to confirm rescheduling");
@@ -314,10 +314,10 @@
         if (real_cost_type == "F" &&
             parseFloat(document.form2.Rext_rate<?php echo $j; ?>.value) <= parseFloat(this.value)) {
           //alert ("For Fixed Internal Cost, it must be less than External Rate");
-          alert ("Invalid \"Internal Rate\".\n\nPlease check with School Admin.");  //jng
+          alert ("WARNING: Abnormal \"Internal Rate\".\n\nPlease check with School Admin.");  //jng
         } else { // value == "S"
           if (parseFloat(this.value) >= 100) {
-            alert ("Invalid \"Internal Split Rate\".\n\nPlease check with School Admin.");  //jng
+            alert ("WARNING: Abnormal \"Internal Split Rate\". It should be less than 100.\n\nPlease check with School Admin.");  //jng
           }
         }
 

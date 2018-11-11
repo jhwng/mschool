@@ -298,13 +298,15 @@ $row_teacher['teacher'] == $selected_teacher ) {echo "selected=\"selected\""; } 
     <tr>
       <td valign="middle"><!--DWLayoutEmptyCell-->&nbsp;</td>
       <td height="23" valign="middle">External Rate: </td>
-      <td colspan="3" valign="middle"><input name="ext_rate" 
-	    <?php
-          if ( $action <> "" ) {
-	        echo "VALUE=" . "\"$ext_rate\"";
-	      }
-	    ?>
-	  type="text" id="ext_rate" size="6" maxlength="6" />
+      <td colspan="3" valign="middle">
+        <input name="ext_rate"
+          onchange='check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);'
+	      <?php
+            if ( $action <> "" ) {
+	          echo "VALUE=" . "\"$ext_rate\"";
+	        }
+	      ?>
+          type="text" id="ext_rate" size="6" maxlength="6" />
           <span class="bluetext">(per 15 minutes, before discount) </span></td>
       <td><!--DWLayoutEmptyCell-->&nbsp;</td>
     </tr>
@@ -313,6 +315,7 @@ $row_teacher['teacher'] == $selected_teacher ) {echo "selected=\"selected\""; } 
       <td height="23" valign="middle">Internal Cost: </td>
       <td colspan="3" valign="middle">
         <input name="internal_cost_override"
+          onchange='check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);'
 	      <?php //jng
             if ( $action <> "" ) {
 	          if ($UserIsManager) {
@@ -334,9 +337,12 @@ $row_teacher['teacher'] == $selected_teacher ) {echo "selected=\"selected\""; } 
   &nbsp;&nbsp;  Cost Type:
         <input name="cost_type_override"
           onChange='this.value=this.value.toUpperCase();
-            if ( this.value != "S" && this.value != "F" ) {
+            check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);
+
+            // jng - the checks below are already covered by check_costs()
+            /*if ( this.value != "S" && this.value != "F" ) {
               alert("Please enter S or F")
-            }
+            }*/
 
             //jng: since we need to consider cost_type, cost_type_override, internal_cost,
             // internal_cost_override etc, it is just easier to do all the checks in checkform.js.

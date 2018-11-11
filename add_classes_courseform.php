@@ -52,6 +52,7 @@ $row_teacher['teacher'] == $teacherName ) {echo "selected=\"selected\""; } ?>><?
             <td align="left">External Rate: </td>
             <td align="left">
               <input name="ext_rate"
+                onchange='check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);'
                 <?php
                 if ( $action <> "" ) {
                   echo "VALUE=" . "\"$external_rate\"";
@@ -65,6 +66,7 @@ $row_teacher['teacher'] == $teacherName ) {echo "selected=\"selected\""; } ?>><?
             <td align="left">Internal Cost: </td>
             <td align="left">
               <input name="internal_cost_override"
+                onchange='check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);'
                 <?php
                 //Bjng
                 /*if ( $action <> "" ) {
@@ -97,9 +99,12 @@ $row_teacher['teacher'] == $teacherName ) {echo "selected=\"selected\""; } ?>><?
 &nbsp;&nbsp;Cost Type:
 <input name="cost_type_override"
   onchange='this.value=this.value.toUpperCase();
-    if (this.value != "S" && this.value != "F") {
+    check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);
+
+    //jng - the checks below are already covered by check_costs()
+    /*if (this.value != "S" && this.value != "F") {
       alert("Please enter S or F");
-    }
+    }*/
 
     //jng: since we need to consider cost_type, cost_type_override, internal_cost,
     // internal_cost_override etc, it is just easier to do all the checks in checkform.js.

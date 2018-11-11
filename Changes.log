@@ -113,3 +113,8 @@ Fixed add_classes.php:
   - terminate_course.php
 - Fixed uninit'ed vars in bulk_changes.php & add_classes.php
 
+[2018-11-11]
+- Use common check_costs() checking function in student_create_form.php
+  and add_classes_courseform.php
+- Use common error/warning messages in class_schedule_row_entry.php
+
