@@ -118,3 +118,6 @@ Fixed add_classes.php:
   and add_classes_courseform.php
 - Use common error/warning messages in class_schedule_row_entry.php
 
+[2018-11-11]
+- Guard against undefined class duration field in class_schedule_update.php
+

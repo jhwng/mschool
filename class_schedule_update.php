@@ -133,7 +133,9 @@ foreach ( $arr_classID as $classID ) {
   $rt = "Rtime" . $j;
   $Rtime = $_POST["$rt"];
   $rdur = "Rduration" . $j;
-  $Rduration = $_POST["$rdur"];
+  //jng: to guard against undefined duration in class schedule records
+  //$Rduration = $_POST["$rdur"];
+  $Rduration = isset($_POST["$rdur"]) ? $_POST["$rdur"] : "";
   $rt = "Rteacher" . $j;
   $Rteacher = $_POST["$rt"];
   $rex = "Rext_rate" . $j;
