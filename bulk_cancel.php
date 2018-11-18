@@ -58,7 +58,12 @@ $teacherName = "";
 $cancelReason = "";
 $remarks = "";
 $byTeacher = "";
-
+$numRows = 0;
+$fromTime24 = "";
+$toTime24 = "";
+$fromTime = "";
+$toTime = "";
+//Ejng
 
 $action = isset($_GET['action']) ? $_GET['action'] : "";
 if ( $action <> "" ) {
@@ -68,9 +73,9 @@ $fromTime = $_POST['from_time'];
 $toTime = $_POST['to_time'];
 $teacherName = $_POST['teacher'];
 $cancelReason = $_POST['cancel_reason'];
-$numRows = $_POST['num_rows'];
+$numRows = isset($_POST['num_rows']) ? $_POST['num_rows'] : "";
 $remarks = $_POST['remarks'];
-$byTeacher = $_POST['by_teacher'];
+$byTeacher = isset($_POST['by_teacher']) ? $_POST['by_teacher'] : "";
 }
 ?>
 </head>

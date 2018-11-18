@@ -135,7 +135,44 @@
     <tr>
       <td height="29" valign="middle"><!--DWLayoutEmptyCell-->&nbsp;</td>
       <td valign="top">Profile:</td>
-      <td colspan="4" valign="middle"><textarea name="profile" cols="90" rows="10" id="profile"><?php if ( $action <> "" ) {echo "$profile"; } ?></textarea></td>
+      <td colspan="4" valign="middle">
+        <textarea name="profile_override" cols="90" rows="10" id="profile_override"
+        <?php
+        if ($action <> "" && !$UserIsManager) {
+            echo "readonly";
+        }
+        ?> >
+          <?php
+          if ( $action <> "" ) {
+            // Since $profile_override is already setup in teacher.php based on
+            // user's role whether he's a Manager or not, there's no need to make
+            // that decision again here.
+            // TODO: check other forms and see if we can simplify them too.
+            echo "$profile_override";
+
+            /*if ($UserIsManager) {
+              echo "$profile_override";
+            }
+            else {
+              //jng - can't use "disabled" attribute since it's not submitted with form
+              echo $unauthorized_msg;
+            }*/
+
+            //echo "$profile";
+          }
+          ?>
+        </textarea>
+      </td>
+    </tr>
+    <tr>
+      <td height="29" valign="middle"><!--DWLayoutEmptyCell-->&nbsp;</td>
+      <td valign="top"></td>
+      <td colspan="4" valign="middle">
+        <!-- jng: can't use "disabled" since the textarea contents are not submitted with form -->
+        <textarea readonly name="profile" cols="90" rows="10" id="profile" style="background-color: red; color: white">
+          <?php if ( $action <> "" ) {echo "$profile"; } ?>
+        </textarea>
+      </td>
     </tr>
     <tr>
       <td height="29" valign="middle"><!--DWLayoutEmptyCell-->&nbsp;</td>

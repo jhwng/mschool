@@ -142,3 +142,10 @@ Fixed add_classes.php:
 - Changed MySQL connection code to use non-persistent connections
 - Added mysql_select_db() call in Connections/promusic.php (for user_admin.php)
 
+[2018-11-18]
+- Implemented visibility control of "internal_cost" and "cost_type" for
+  teacher-profile:
+  - teacher.php
+  - teacher_form.php
+- Fixed uninit'ed vars in holiday and bulk-cancel pages
+

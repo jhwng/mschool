@@ -54,25 +54,39 @@ include 'banner1.php';
 /*
 action = 1 - Create New Teacher
 action = 3 - Retrieve teacher profile
-actuin = 4 - Commit Edit student profile
+action = 4 - Update teacher profile
 */
-$action = $_GET['action'];
-$submit = $_POST['submit1'];
-$teacher_id = $_POST['teacher_id'];
-$teacher = $_POST['teacher'];
-$addr1 = $_POST['addr1'];
-$addr2 = $_POST['addr2'];
-$city = $_POST['city'];
-$province = $_POST['province'];
-$postal_code = $_POST['postal_code'];
-$home_tel = $_POST['home_tel'];
-$cell_tel = $_POST['cell_tel'];
-$other_tel = $_POST['other_tel'];
-$sin = $_POST['sin'];
-$email = $_POST['email'];
-$teacher_since = $_POST['teacher_since'];
-$profile = $_POST['profile'];
-$active = $_POST['active'];
+
+//Bjng
+$action = isset($_GET['action']) ? $_GET['action'] : "";
+$submit = isset($_POST['submit1']) ? $_POST['submit1'] : "";
+$teacher_id = isset($_POST['teacher_id']) ? $_POST['teacher_id'] : "";
+$teacher = isset($_POST['teacher']) ? $_POST['teacher'] : "";
+$addr1 = isset($_POST['addr1']) ? $_POST['addr1'] : "";
+$addr2 = isset($_POST['addr2']) ? $_POST['addr2'] : "";
+$city = isset($_POST['city']) ? $_POST['city'] : "";
+$province = isset($_POST['province']) ? $_POST['province'] : "";
+$postal_code = isset($_POST['postal_code']) ? $_POST['postal_code'] : "";
+$home_tel = isset($_POST['home_tel']) ? $_POST['home_tel'] : "";
+$cell_tel = isset($_POST['cell_tel']) ? $_POST['cell_tel'] : "";
+$other_tel = isset($_POST['other_tel']) ? $_POST['other_tel'] : "";
+$sin = isset($_POST['sin']) ? $_POST['sin'] : "";
+$email = isset($_POST['email']) ? $_POST['email'] : "";
+$teacher_since = isset($_POST['teacher_since']) ? $_POST['teacher_since'] : "";
+$profile = isset($_POST['profile']) ? $_POST['profile'] : "";
+$active = isset($_POST['active']) ? $_POST['active'] : "";
+//Ejng
+
+//Bjng
+$unauthorized_msg = "\nTHIS USER IS NOT AUTHORIZED TO VIEW PROFILE DETAILS.";
+
+$profile_override=isset($_POST['profile_override']) ? $_POST['profile_override'] : $profile;
+
+$real_profile=$profile;
+if ($profile_override != "" && (strcmp(trim($profile_override), trim($unauthorized_msg)) != 0)) {
+    $real_profile = $profile_override;
+}
+//Ejng
 
 if ( $action == 1 )   // Create Teacher
 {
@@ -83,6 +97,7 @@ if ( $action == 1 )   // Create Teacher
   }
   
   if ( $error == 0 ) {
+
     // first check if teacher already exists
     $query = "SELECT teacher_id from teacher where teacher=\"$teacher\" ";
 	$result = mysql_query($query, $promusic) or die(mysql_error());
@@ -91,12 +106,13 @@ if ( $action == 1 )   // Create Teacher
 	  echo "<script>alert('Teacher already exists')</script>";
     }
     else {
+
       $query = "INSERT INTO teacher " .
 	   "(teacher, addr1, addr2, city, province, postal_code, home_tel, " .
 	   "cell_tel, other_tel, email, sin, profile, teacher_since, active ) " .
 	   "VALUES ( \"$teacher\", \"$addr1\", \"$addr2\", \"$city\", \"$province\", " .
 	   "\"$postal_code\", \"$home_tel\", \"$cell_tel\", \"$other_tel\", " .
-	   "\"$email\", \"$sin\", \"$profile\", \"$teacher_since\", \"$active\" )";
+	   "\"$email\", \"$sin\", \"$real_profile\", \"$teacher_since\", \"$active\" )";
 	  // echo "$query<br>";
 	  $result = mysql_query($query, $promusic) or die(mysql_error());
 	  echo '<script>alert("Teacher entry has been created")</script>'; 
@@ -123,6 +139,13 @@ if ( $action == 3 )   // Retrieve Teacher info
 	else {
       $row = mysql_fetch_array($result);
       extract($row);
+
+      // Bjng - initialize profile_override from query result.
+      if ($UserIsManager) {
+        $profile_override = $profile;
+      } else {
+        $profile_override = $unauthorized_msg;
+      } //Ejng
 	}
   }
 }  // end action = 3
@@ -135,11 +158,12 @@ if ( $action == 4 ) {
   }
   else
   {
+
     $query = "UPDATE teacher SET " .
 	   "addr1=\"$addr1\", addr2=\"$addr2\", city=\"$city\", province=\"$province\", " .
 	   "postal_code=\"$postal_code\", teacher=\"$teacher\", sin=\"$sin\", " .
 	   "home_tel=\"$home_tel\", cell_tel=\"$cell_tel\", other_tel=\"$other_tel\", " .
-	   "email=\"$email\", teacher_since=\"$teacher_since\", profile=\"$profile\", " .
+	   "email=\"$email\", teacher_since=\"$teacher_since\", profile=\"$real_profile\", " .
 	   "active=\"$active\" " .
 	   "WHERE teacher_id = $teacher_id ";
     // echo "$query<br>";
