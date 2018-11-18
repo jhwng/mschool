@@ -165,15 +165,23 @@ function getSelectedRadio(buttonGroup) {
 
 function checkBulkChangesFields (form, isManager) {
    //Bjng
-   if (form.old_start_date.value == "" ||
-       !checkDateFormat(form, form.old_start_date)) {
-       alert ('Error: Missing or invalid \"Old Start Date\"');
+   if (form.old_start_date.value == "") {
+       alert ('Error: Missing \"Old Start Date\"');
        return false;
    }
 
-   if (form.new_start_date.value == "" ||
-       !checkDateFormat(form, form.new_start_date)) {
-       alert ('Error: Missing or invalid \"New Start Date\"');
+   if (form.new_start_date.value == "") {
+       alert ('Error: Missing \"New Start Date\"');
+       return false;
+   }
+
+   rc = checkDateFormat(form, form.old_start_date);
+   if (!rc) {
+       return false;
+   }
+
+   rc = checkDateFormat(form, form.new_start_date);
+   if (!rc) {
        return false;
    }
 
@@ -183,9 +191,8 @@ function checkBulkChangesFields (form, isManager) {
    }
 
    var rc = check_costs(form, true, isManager);
-
    if (!rc) {
-      return false;
+       return false;
    }
    //Ejng
 

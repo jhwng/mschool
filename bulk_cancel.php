@@ -52,7 +52,15 @@ body {
 // action = 1 - user clicked bulk cancel button
 // action = 2 - user clicked confirm cancel
 
-$action = $_GET['action'];
+//Bjng
+// initialize vars
+$teacherName = "";
+$cancelReason = "";
+$remarks = "";
+$byTeacher = "";
+
+
+$action = isset($_GET['action']) ? $_GET['action'] : "";
 if ( $action <> "" ) {
 $fromDate = $_POST['from_date'];
 $toDate = $_POST['to_date'];

@@ -187,6 +187,10 @@ function checkAddClassFields (form, isManager) {
    if (!rc) {
        return false;
    }
+
+   if (!checkStartEndDates(form, form.add_start_date, form.add_end_date)) {
+       return false;
+   }
    //Ejng
 
    // returns the value of the selected radio button or "" if no button is selected

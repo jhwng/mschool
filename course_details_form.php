@@ -1,6 +1,11 @@
       </form>
       <form id="courseform" name="courseform" method="post" action=""
-            onsubmit="return check_costs(this, true, <?php if ($UserIsManager) echo "true"; else echo "false" ?>);">
+            onsubmit="
+              if (!checkStartEndDates(this, this.from_date, this.to_date))    {
+                return false;
+              }
+              return check_costs(this, true, <?php if ($UserIsManager) echo "true"; else echo "false" ?>);
+            ">
         <table width="772" border="0" cellspacing="0" cellpadding="0">
           
           <tr>
@@ -11,12 +16,38 @@
           <tr>
             <td width="163" height="25">&nbsp;</td>
             <td width="211" align="left">Start Date: </td>
-            <td width="398" align="left"><input name="from_date" type="text" id="from_date" size="10" maxlength="10" onchange='checkDateFormat(form, this)' <?php if ( $action <> "" ) echo "VALUE=\"" . $fromDate . "\""; ?>/></td>
+            <td width="398" align="left">
+              <input name="from_date" type="text" id="from_date" size="10" maxlength="10"
+                onchange='
+                  if (!checkDateFormat(form, this)) {
+                      this.select();
+                      return false;
+                  }
+                  if (!validateStartEndDates(form, this, form.to_date)) {
+                      this.select();
+                      return false;
+                  }
+                  //checkDateFormat(form, this);
+                '
+                <?php if ( $action <> "" ) echo "VALUE=\"" . $fromDate . "\""; ?>/></td>
           </tr>
           <tr>
             <td height="25">&nbsp;</td>
             <td align="left">End Date: </td>
-            <td align="left"><input name="to_date" type="text" id="to_date" size="10" maxlength="10" onchange='checkDateFormat(form, this)'  <?php if ( $action <> "" ) echo "VALUE=\"" . $toDate . "\""; ?>/></td>
+            <td align="left">
+              <input name="to_date" type="text" id="to_date" size="10" maxlength="10"
+                onchange='
+                  if (!checkDateFormat(form, this)) {
+                      this.select();
+                      return false;
+                  }
+                  if (!validateStartEndDates(form, form.from_date, this)) {
+                      this.select();
+                      return false;
+                  }
+                  //checkDateFormat(form, this);
+                '
+                <?php if ( $action <> "" ) echo "VALUE=\"" . $toDate . "\""; ?>/></td>
           </tr>
           
           <tr>
@@ -86,7 +117,12 @@ $row_teacher['teacher'] == $teacher ) {echo "selected=\"selected\""; } ?>><?php 
             <td align="left">Internal Cost: </td>
             <td align="left">
               <input name="internal_cost_override"
-                onchange='check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);'
+                onchange='
+                if (!check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>)) {
+                    this.select();
+                    return false;
+                }
+                '
                 <?php
                 /*if ( $action <> "" ) {echo "VALUE=" . "\"$internal_cost\"";}*/
                 if ( $action <> "" ) {

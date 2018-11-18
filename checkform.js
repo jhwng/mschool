@@ -71,7 +71,10 @@ function checkDateFormat (form, date1) {
 	if( ((day==dteDate.getDate()) && (month==dteDate.getMonth()) && (year==dteDate.getFullYear())) )
 	{
 		date1.value = year1 + "-" + month1 + "-" + day1;
-	    if ( date1.value <= '1900-01-01' ) {
+	    //jng - if ( date1.value <= '1900-01-01' ) {
+		//jng - now is 2018, so let's put 2028 as the limit. If we're still
+		//      in biz after 10 years, then it's a good problem to have :-)
+        if ( date1.value <= '2012-01-01' || date1.value > '2028-01-01') {
 		   alert ('Invalid Date Format');
 		   date1.focus();
 		   return false;
@@ -128,7 +131,7 @@ function check_costs(form, confirmWarning, isManager) {
     var ext_rate = parseFloat(form.ext_rate.value);
     if ( isNaN(ext_rate) || ext_rate <= 0 ) {
         alert('Invalid External Rate. Must be a numeric > 0');
-        form.ext_rate.focus();
+        form.ext_rate.select();
         return false;
     }
     var internal_cost = parseFloat(form.internal_cost.value);
@@ -140,7 +143,7 @@ function check_costs(form, confirmWarning, isManager) {
         //(isNaN(internal_cost) && form.internal_cost.value != "") || //jng - don't remember why internal_cost can be "" either...
         isNaN(internal_cost) || internal_cost <= 0 ) {
         alert('Invalid database "Internal Cost". Must be a numeric > 0');
-        form.internal_cost.focus();
+        form.internal_cost.select();
         return false;
     }
 
@@ -149,7 +152,7 @@ function check_costs(form, confirmWarning, isManager) {
 		(form.internal_cost_override.value != "-" &&
          (isNaN(internal_cost_override) || internal_cost_override <= 0))) {
         alert('Invalid "Internal Cost". Must be a numeric > 0');
-        form.internal_cost_override.focus();
+        form.internal_cost_override.select();
         return false;
     }
 
@@ -159,7 +162,7 @@ function check_costs(form, confirmWarning, isManager) {
         //form.cost_type.value != "" && form.cost_type.value != "S" && form.cost_type.value != "F" ) {
 		(form.cost_type.value != "S" && form.cost_type.value != "F")) {
         alert('Invalid database "Cost Type". Must be "S" or "F"');
-        form.cost_type.focus();
+        form.cost_type.select();
         return false;
     }
 
@@ -168,7 +171,7 @@ function check_costs(form, confirmWarning, isManager) {
 		(form.cost_type_override.value != "-" &&
          form.cost_type_override.value != "S" && form.cost_type_override.value != "F")) {
         alert('Invalid "Cost Type". Must be "S", or "F"');
-        form.cost_type_override.focus();
+        form.cost_type_override.select();
         return false;
     }
 
@@ -190,13 +193,13 @@ function check_costs(form, confirmWarning, isManager) {
             //alert ("Invalid \"External Rate\":\nFor \"Fixed Cost Type\" it must be greater than \"Internal Cost\".\n\nPlease check with School Admin.");
             if (confirmWarning) {
               if (!confirm("WARNING: Abnormal \"External Rate\".\n\nContinue?")) {
-                form.ext_rate.focus();
+                form.ext_rate.select();
                 return false;
               }
             }
             else {
               alert("WARNING: Abnormal \"External Rate\".\n\nPlease check with School Admin.");
-              form.ext_rate.focus();
+              form.ext_rate.select();
               return false;
             }
         }
@@ -205,13 +208,13 @@ function check_costs(form, confirmWarning, isManager) {
         if (internal_cost_check >= 100) {
             if (confirmWarning) {
                 if (!confirm("WARNING: Abnormal \"Internal Cost\":\nFor \"Split Cost Type\" it should be less than 100.\n\nContinue?")) {
-                    form.internal_cost_override.focus();
+                    form.internal_cost_override.select();
                     return false;
 			    }
             }
             else {
                 alert("WARNING: Abnormal \"Internal Cost\":\nFor \"Split Cost Type\" it should be less than 100.\n\nPlease check with School Admin.");
-                form.internal_cost_override.focus();
+                form.internal_cost_override.select();
                 return false;
             }
         }
@@ -264,16 +267,77 @@ function check_student_form(form, source, isManager) {
 	      form.time.select();
 	      return false;
 	    }
-	
+
+	    /* jng: that's not the right way to compare dates man!
 	    if (form.start_date.value > form.end_date.value ) {
 	      alert('Start Date Must be earlier than End Date');
 	      return false;
-	    }
-	  }
+	    }*/
+
+        if (!checkStartEndDates(form, form.start_date, form.end_date)) {
+        	return false;
+		}
+      }
     }
 
     return true;
 }
+
+//Bjng
+function validateStartEndDates(form, start_date, end_date) {
+    // Check to make sure end date > start date
+    var startDate = new Date(start_date.value);
+    var endDate = new Date(end_date.value);
+
+    // Only do the comparison if both start & end dates are valid dates
+    if (!isNaN(startDate) && !isNaN(endDate)) {
+        if (startDate > endDate) {
+            start_date.select();
+            alert('Error: \"Start Date\" must be the same or earlier than \"End Date\"');
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function checkStartEndDates(form, start_date, end_date) {
+	// start_date and end_date are form objects (not extracted values)
+    if (start_date.value == "") {
+        alert ('Error: Missing \"Start Date\"');
+        start_date.select();
+        return false;
+    }
+
+    if (end_date.value == "") {
+        alert ('Error: Missing \"End Date\"');
+        end_date.select();
+        return false;
+    }
+
+    rc = checkDateFormat(form, start_date);
+    if (!rc) {
+        return false;
+    }
+
+    rc = checkDateFormat(form, end_date);
+    if (!rc) {
+        return false;
+    }
+
+    // Check to make sure end date > start date
+    var startDate = new Date(start_date.value);
+    var endDate = new Date(end_date.value);
+
+    if (startDate > endDate) {
+    	start_date.select();
+        alert ('Error: \"Start Date\" must be the same or earlier than \"End Date\"');
+        return false;
+    }
+
+    return true;
+}
+//Ejng
 
 function lookupTeacherRateForClass (form, teacherName, courseName, rowNum) {
 	if (ratesWindow) { ratesWindow.close(); }

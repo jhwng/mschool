@@ -11,14 +11,40 @@
           </tr>
           <tr>
             <td width="163" height="25">&nbsp;</td>
-            <td width="211" align="left">Old Start  Date: </td>
-            <td width="398" align="left"><input name="old_start_date" type="text" id="old_start_date" size="10" maxlength="10" onchange='checkDateFormat(form, this)' <?php if ( $action <> "" ) {echo "VALUE=" . "\"$oldStartDate\""; } ?>/></td>
+            <td width="211" align="left">Old Start Date: </td>
+            <td width="398" align="left">
+              <input name="old_start_date" type="text" id="old_start_date" size="10" maxlength="10"
+                onchange='
+                  //Bjng
+                  //checkDateFormat(form, this);
+                  if (!checkDateFormat(form, this)) {
+                      return false;
+                  }
+                  if (!validateStartEndDates(form, this, form.new_start_date)) {
+                      return false;
+                  }
+                  //Ejng
+                '
+                <?php if ( $action <> "" ) {echo "VALUE=" . "\"$oldStartDate\""; } ?>/></td>
           </tr>
           
           <tr>
             <td height="25">&nbsp;</td>
             <td align="left">New Start Date: </td>
-            <td align="left"><input name="new_start_date" type="text" id="new_start_date" size="10" maxlength="10" onchange='checkDateFormat(form, this)' <?php if ( $action <> "" ) {echo "VALUE=" . "\"$newStartDate\""; } ?>/></td>
+            <td align="left">
+              <input name="new_start_date" type="text" id="new_start_date" size="10" maxlength="10"
+                onchange='
+                  //Bjng
+                  //checkDateFormat(form, this)
+                  if (!checkDateFormat(form, this)) {
+                      return false;
+                  }
+                  if (!validateStartEndDates(form, form.old_start_date, this)) {
+                      return false;
+                  }
+                  //Ejng
+                '
+                <?php if ( $action <> "" ) {echo "VALUE=" . "\"$newStartDate\""; } ?>/></td>
           </tr>
           
           <tr>
@@ -76,7 +102,11 @@ $row_teacher['teacher'] == $teacherName ) {echo "selected=\"selected\""; } ?>><?
             <td align="left">Internal Cost: </td>
             <td align="left">
               <input name="internal_cost_override"
-                onchange='check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);'
+                onchange='
+                if (!check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>)) {
+                  this.select();
+                  return false;
+                }'
                 <?php
                 /*if ( $action <> "" ) {echo "VALUE=" . "\"$internal_cost\""; }*/
                 if ( $action <> "" ) {

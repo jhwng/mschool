@@ -66,7 +66,12 @@ $row_teacher['teacher'] == $teacherName ) {echo "selected=\"selected\""; } ?>><?
             <td align="left">Internal Cost: </td>
             <td align="left">
               <input name="internal_cost_override"
-                onchange='check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);'
+                onchange='
+                if (!check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>)) {
+                    this.select();
+                    return false;
+                }
+                '
                 <?php
                 //Bjng
                 /*if ( $action <> "" ) {
@@ -200,14 +205,41 @@ $row_teacher['teacher'] == $teacherName ) {echo "selected=\"selected\""; } ?>><?
           <tr>
             <td height="25">&nbsp;</td>
             <td align="left">Add Start Date: </td>
-            <td align="left"><input name="add_start_date" type="text" id="add_start_date" onChange='checkDateFormat(form, this);if (document.courseform.add_end_date.value < this.value ) { alert("Start Date Must be earlier than End Date"); }' 
+            <td align="left">
+              <input name="add_start_date" type="text" id="add_start_date"
+                onChange='
+                  if (!checkDateFormat(form, this)) {
+                      this.select();
+                      return false;
+                  }
+                  if (!validateStartEndDates(form, this, form.add_end_date)) {
+                      this.select();
+                      return false;
+                  }
+                  /*checkDateFormat(form, this);
+                  if (document.courseform.add_end_date.value < this.value ) {
+                    alert("Start Date Must be earlier than End Date");
+                  }*/'
 			  <?php if ( $addStartDate <> "" ) echo "value=\"$addStartDate\""; ?> size="10" maxlength="12" />              
             <span class="bluetext">( Course Start Date: <?php echo "$cStartDate"; ?> ) </span></td>
           </tr>
           <tr>
             <td height="25">&nbsp;</td>
             <td align="left">Add End Date : </td>
-            <td align="left"><input name="add_end_date" type="text" id="add_end_date" onChange='checkDateFormat(form, this);if (this.value < document.courseform.add_start_date.value ) { alert("Start Date Must be earlier than End Date"); }' 
+            <td align="left">
+              <input name="add_end_date" type="text" id="add_end_date"
+                onChange='
+                  if (!checkDateFormat(form, this)) {
+                      this.select();
+                      return false;
+                  }
+                  if (!validateStartEndDates(form, form.add_start_date, this)) {
+                      this.select();
+                      return false;
+                  }
+                  /*if (this.value < document.courseform.add_start_date.value ) {
+                    alert("Start Date Must be earlier than End Date");
+                  }*/'
 			  <?php if ( $addEndDate <> "" ) echo "value=\"$addEndDate\""; ?> size="10" maxlength="12" /> 
               <span class="bluetext">( Course End Date: &nbsp;<?php echo "$cEndDate"; ?> ) </span></td>
           </tr>

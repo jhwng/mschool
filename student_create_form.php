@@ -315,7 +315,12 @@ $row_teacher['teacher'] == $selected_teacher ) {echo "selected=\"selected\""; } 
       <td height="23" valign="middle">Internal Cost: </td>
       <td colspan="3" valign="middle">
         <input name="internal_cost_override"
-          onchange='check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>);'
+          onchange='
+          if (!check_costs(form, false, <?php if ($UserIsManager) echo "true"; else echo "false"?>)) {
+            this.select();
+            return false;
+          }
+          '
 	      <?php //jng
             if ( $action <> "" ) {
 	          if ($UserIsManager) {
@@ -438,13 +443,43 @@ $row_teacher['teacher'] == $selected_teacher ) {echo "selected=\"selected\""; } 
     <tr>
       <td valign="middle"><!--DWLayoutEmptyCell-->&nbsp;</td>
       <td height="23" valign="middle">Start Date: </td>
-      <td colspan="3" valign="middle"><input name="start_date" type="text" id="start_date" size="12" maxlength="12" <?php echo "VALUE=\"" . $start_date . "\""; ?> onchange='checkDateFormat(form, this)' /></td>
+      <td colspan="3" valign="middle">
+        <input name="start_date" type="text" id="start_date" size="12" maxlength="12" <?php echo "VALUE=\"" . $start_date . "\""; ?>
+          onchange='
+            if (!checkDateFormat(form, this)) {
+              this.select();
+              return false;
+            }
+            if (!validateStartEndDates(form, this, form.end_date)) {
+              this.select();
+              return false;
+            }
+            /*checkDateFormat(form, this);
+            if (document.courseform.add_end_date.value < this.value ) {
+              alert("Start Date must be earlier than End Date");
+            }*/'
+        />
+      </td>
       <td></td>
     </tr>
     <tr>
       <td valign="middle"><!--DWLayoutEmptyCell-->&nbsp;</td>
       <td height="23" valign="middle">End Date: </td>
-      <td colspan="3" valign="middle"><input name="end_date" type="text" id="end_date" size="12" maxlength="12" <?php echo "VALUE=\"" . $end_date . "\""; ?> onchange='checkDateFormat(form, this)' /></td>
+      <td colspan="3" valign="middle">
+        <input name="end_date" type="text" id="end_date" size="12" maxlength="12" <?php echo "VALUE=\"" . $end_date . "\""; ?>
+          onchange='
+            if (!checkDateFormat(form, this)) {
+              this.select();
+              return false;
+            }
+            if (!validateStartEndDates(form, form.start_date, this)) {
+              this.select();
+              return false;
+            }
+            //checkDateFormat(form, this)
+          '
+        />
+      </td>
       <td></td>
     </tr>
     

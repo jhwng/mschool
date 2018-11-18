@@ -121,3 +121,20 @@ Fixed add_classes.php:
 [2018-11-11]
 - Guard against undefined class duration field in class_schedule_update.php
 
+[2018-11-18]
+- Added validatation and checking of start/end and to/from dates for various forms
+- Set valid date ranges: 2012-01-01 to 2028-01-01
+- Improved usability by "focusing & selecting" the problematic field
+- Standardized error/alert messages
+- Refactored code to checkform.js
+  - add_classes.php
+  - add_classes_courseform.php
+  - bulk_changes.php
+  - bulk_changes_form.php
+  - checkform.js
+  - class_schedule_row_entry.php
+  - course_details_form.php
+  - student_create_form.php
+- Fixed uninit'ed vars in bulk-cancel page
+  - bulk_cancel.php
+
