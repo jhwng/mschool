@@ -149,3 +149,7 @@ Fixed add_classes.php:
   - teacher_form.php
 - Fixed uninit'ed vars in holiday and bulk-cancel pages
 
+[2018-11-21]
+- Fixed "minute_balance" for Duration bug in class_schedule_row_entry.php
+  (due to a bug resulted from cleaning up its ugly formatting!)
+

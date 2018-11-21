@@ -49,12 +49,11 @@
     <?php echo $duration; ?>
 	<?php
     if ( $cancelReason == "W" || $cancelReason == "T" ) {
-      if ( $minute_balance > 0 ) {
-        echo "<span class=\"redtext\"><br>( $minute_balance )</span>";
-      }
-    }
-    else {
-      echo "<span class=\"style6 style8\"><br>( $minute_balance )</span>";
+        if ($minute_balance > 0) {
+            echo "<span class=\"redtext\"><br>( $minute_balance )</span>";
+        } else {
+            echo "<span class=\"style6 style8\"><br>( $minute_balance )</span>";
+        }
     }
     ?>
     </div>
