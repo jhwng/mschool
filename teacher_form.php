@@ -169,7 +169,7 @@
       <td valign="top"></td>
       <td colspan="4" valign="middle">
         <!-- jng: can't use "disabled" since the textarea contents are not submitted with form -->
-        <textarea readonly name="profile" cols="90" rows="10" id="profile" style="background-color: red; color: white">
+        <textarea hidden name="profile" cols="90" rows="10" id="profile" style="background-color: red; color: white">
           <?php if ( $action <> "" ) {echo "$profile"; } ?>
         </textarea>
       </td>

@@ -153,3 +153,6 @@ Fixed add_classes.php:
 - Fixed "minute_balance" for Duration bug in class_schedule_row_entry.php
   (due to a bug resulted from cleaning up its ugly formatting!)
 
+[2018-11-21]
+- Removed "red-white" internal_cost and cost_type debug fields
+

@@ -166,7 +166,7 @@ $row_teacher['teacher'] == $teacherName ) {echo "selected=\"selected\""; } ?>><?
                 }*/
                 echo " readonly";
                 ?>
-                type="text"
+                type="hidden"
                 id="internal_cost" size="6" maxlength="6" />
 
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -185,7 +185,7 @@ $row_teacher['teacher'] == $teacherName ) {echo "selected=\"selected\""; } ?>><?
                 }*/
                 echo " readonly";
                 ?>
-                type="text"
+                type="hidden"
                 id="cost_type" size="4" maxlength="4" />
             </td>
           </tr>

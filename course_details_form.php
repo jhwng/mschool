@@ -182,7 +182,7 @@ $row_teacher['teacher'] == $teacher ) {echo "selected=\"selected\""; } ?>><?php 
                 }*/
                 echo " readonly";
                 ?>
-                type="text"
+                type="hidden"
                 id="internal_cost" size="6" maxlength="6" />
 
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -201,7 +201,7 @@ $row_teacher['teacher'] == $teacher ) {echo "selected=\"selected\""; } ?>><?php 
                 }*/
                 echo " readonly";
                 ?>
-                type="text"
+                type="hidden"
                 id="cost_type" size="4" maxlength="4" />
             </td>
           </tr>

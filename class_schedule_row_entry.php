@@ -386,14 +386,14 @@
 
       <br>
 
-    <input type="text" readonly style="background-color: red; color: white"
+    <input type="hidden" readonly style="background-color: red; color: white"
       name="Rcost<?php echo $j; ?>" id="Rcost<?php echo $j; ?>" size="4" maxlength="8"
       <?php
       echo "VALUE=\"" . $internalCost . "\"";
       ?>
     />
 
-    <input type="text" readonly style="background-color: red; color: white"
+    <input type="hidden" readonly style="background-color: red; color: white"
       name="Rcost_type<?php echo $j; ?>" id="Rcost_type<?php echo $j; ?>" size="1" maxlength="1"
       <?php
       echo "VALUE=\"" . $costType . "\"";
