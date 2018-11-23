@@ -8,21 +8,30 @@ mysql_select_db($database_promusic, $promusic);
 // action = 3 - get course list only
 // action =4 - display balance report via GET
 
-$action=$_GET['action'];
+//Bjng
+// Init vars
+$startdate="";
+$fullname="";
+$course_id="";
+$student_id="";
+$numRows=0;
+//Ejng
+
+$action=isset($_GET['action']) ? $_GET['action'] : "";
 if ( $action <> "" ) {
   if ( $action <> 4 ) {
     $fullname=$_POST['full_name'];
-    $courseName=$_POST['course_name'];
-    $schyear=$_POST['school_year'];
+    $courseName=isset($_POST['course_name']) ? $_POST['course_name'] : "";
+    $schyear=isset($_POST['school_year']) ? $_POST['school_year'] : "";
     $startdate=$_POST['start_date'];
     $enddate=$_POST['end_date'];
-    $time=$_POST['time'];
-    $duration=$_POST['duration'];
-    $teacher=$_POST['teacher'];
+    $time=isset($_POST['time']) ? $_POST['time'] : "";
+    $duration=isset($_POST['duration']) ? $_POST['duration'] : "";
+    $teacher=isset($_POST['teacher']) ? $_POST['teacher'] : "";
     $student_id=$_POST['student_id'];
-    $dow=$_POST['dow'];
+    $dow=isset($_POST['dow']) ? $_POST['dow'] : "";
     $course_id=$_POST['course_id'];
-	$delete=$_POST['delete'];
+    $delete=isset($_POST['delete']) ? $_POST['delete'] : "";
   }
   else {
     $fullname=$_GET['full_name'];
@@ -194,7 +203,10 @@ if ( $numRows > 1 && $action == 3 ) {
 
 // Retrieve Payment Schedule
 $error = 0;
-if ( $action == 4 ) { echo "<script>document.form1.getlist.click(); document.form1.retrieve.click()</script>"; }
+if ( $action == 4 ) {
+  echo "<script>document.form1.getlist.click(); document.form1.retrieve.click()</script>";
+}
+
 if ( $action == 1 ) {
   if ( $student_id == "" || $course_id < 1 ) {
     echo "<script>alert ('You need to select a student and course for the Monthly Balance listing')</script>";
@@ -233,262 +245,291 @@ if ( $action == 1 ) {
 	  $error = 1;
 	  echo "<div align='center'><p><pre>No registered course found. Please check you search criteria and try again.             </pre></p></div>";
 	}
-	else {
-    $row = mysql_fetch_array($result);
-    extract($row);
+    else {
+      $row = mysql_fetch_array($result);
+      extract($row);
 	
-	// setup arrary to display dow
-	$dayOfWeek[0] = "Sun";
-	$dayOfWeek[1] = "Mon";
-	$dayOfWeek[2] = "Tue";
-	$dayOfWeek[3] = "Wed";
-	$dayOfWeek[4] = "Thu";
-	$dayOfWeek[5] = "Fri";
-	$dayOfWeek[6] = "Sat";
+      // setup array to display dow
+      $dayOfWeek[0] = "Sun";
+      $dayOfWeek[1] = "Mon";
+      $dayOfWeek[2] = "Tue";
+      $dayOfWeek[3] = "Wed";
+      $dayOfWeek[4] = "Thu";
+      $dayOfWeek[5] = "Fri";
+      $dayOfWeek[6] = "Sat";
 	
-    require ('balance_report_header.php');
+      require ('balance_report_header.php');
 
-	list($yyyy, $mm, $dd) = split('[/.-]', $yearStartDate);
-	$mm = 7;
-    $firstDayOfMth = date ("Y-m-d", mktime(0, 0, 0, date("$mm"), 1, $fromYear));
-	$lastDayOfMth = date ("Y-m-d", mktime(0, 0, 0, date("$mm")+1, 0, $fromYear));
-	$ttlSchPayment = 0;
-	$ttlLessons = 0;
-	$ttlAdHoc = 0;
-	$ttlMiscAmt = 0;
-	$$ttlUsage = 0;
-	$monthlyPDchqAmount = 0;
-	$adHocPayment = 0;
-	$miscAmt = 0;
-	$usageAmt = 0;
-    $number_of_lessons = 0;
+      list($yyyy, $mm, $dd) = split('[/.-]', $yearStartDate);
+      $mm = 7;
+      $firstDayOfMth = date ("Y-m-d", mktime(0, 0, 0, date("$mm"), 1, $fromYear));
+      $lastDayOfMth = date ("Y-m-d", mktime(0, 0, 0, date("$mm")+1, 0, $fromYear));
+      $ttlSchPayment = 0;
+      $ttlLessons = 0;
+      $ttlAdHoc = 0;
+      $ttlMiscAmt = 0;
+      //$$ttlUsage = 0;  //jng - Raymond bug!!
+      $ttlUsage = 0;
+      $monthlyPDchqAmount = 0;
+      $adHocPayment = 0;
+      $miscAmt = 0;
+      $usageAmt = 0;
+      $number_of_lessons = 0;
+      $balance = 0; //jng
+      $WrunningTotal = 0; //jng
+      $TrunningTotal = 0; //jng
+      $strong = 0; //jng
 
-	// now display prior to school year row
-	  $month = "Before Year";
+      // now display prior to school year row
+      $month = "Before Year";
 
-	  $query = "SELECT sum(amount) as monthlyPDchqAmount FROM student_scheduled_payments " .
-	     "WHERE student_id=$student_id AND course_id=$course_id " .
-		 "AND ( status = \"R\" OR status = \"D\" OR status = \"H\" OR status = \"S\" ) " .
-	     "AND cheque_date < \"$yearStartDate\" and school_year = \"$schYear\"";
+      $query = "SELECT sum(amount) as monthlyPDchqAmount FROM student_scheduled_payments " .
+               "WHERE student_id=$student_id AND course_id=$course_id " .
+               "AND ( status = \"R\" OR status = \"D\" OR status = \"H\" OR status = \"S\" ) " .
+               "AND cheque_date < \"$yearStartDate\" and school_year = \"$schYear\"";
       // echo "$query<br>";
-	  $result = mysql_query($query, $promusic) or die(mysql_error());
+      $result = mysql_query($query, $promusic) or die(mysql_error());
       $numRows = mysql_num_rows($result);
       $row = mysql_fetch_array($result);
       extract($row);
+
       if ( $monthlyPDchqAmount == "" ) {
-	    $monthlyPDchqAmount = 0;
-	  }
-	  $ttlSchPayment += $monthlyPDchqAmount;
+        $monthlyPDchqAmount = 0;
+      }
+      $ttlSchPayment += $monthlyPDchqAmount;
 
-	  $query = "SELECT sum(amount) as adHocPayment from adhoc_payments " .
-	     "where student_id=$student_id and course_id=$course_id and " .
-		 "date < \"$yearStartDate\" and school_year = \"$schYear\"";
+      $query = "SELECT sum(amount) as adHocPayment from adhoc_payments " .
+               "where student_id=$student_id and course_id=$course_id and " .
+               "date < \"$yearStartDate\" and school_year = \"$schYear\"";
+
       $result = mysql_query($query, $promusic) or die(mysql_error());
       $row = mysql_fetch_array($result);
       extract($row);
+
       if ( $adHocPayment == "" ) {
-	    $adHocPayment = 0;
-	  }  // end if numRows = null
-	  $ttlAdHoc += $adHocPayment;
+        $adHocPayment = 0;
+      }  // end if numRows = null
+      $ttlAdHoc += $adHocPayment;
 
-	  $query = "SELECT sum(amount) as miscAmt from misc_items " .
-	     "where student_id=$student_id and course_id=$course_id and " .
-		 "date  < \"$yearStartDate\" and school_year = \"$schYear\"";
+      $query = "SELECT sum(amount) as miscAmt from misc_items " .
+               "where student_id=$student_id and course_id=$course_id and " .
+               "date  < \"$yearStartDate\" and school_year = \"$schYear\"";
+
       $result = mysql_query($query, $promusic) or die(mysql_error());
       $row = mysql_fetch_array($result);
       extract($row);
+
       if ( $miscAmt == "" ) {
 	    $miscAmt = 0;
-	  }  // end if numRows = null
-	  $ttlMiscAmt += $miscAmt;
+      }  // end if numRows = null
+      $ttlMiscAmt += $miscAmt;
 
-	  $balance += $monthlyPDchqAmount + $adHocPayment - $miscAmt - $usageAmt;
+      $balance += $monthlyPDchqAmount + $adHocPayment - $miscAmt - $usageAmt;
       require ('balance_report_row_entry.php');
 	
-	$i = 1;
-	while ( $i <= 12 ) {
-	  // Get Payment Schedule Info
-      list($yyyy1, $mm1, $dd1) = split('[/.-]', $firstDayOfMth);
-	  $month1 = $yyyy1 . "-" . $mm1;
-	  $month = $month1;
-	  
+      $i = 1;
+      while ( $i <= 12 ) {
+        // Get Payment Schedule Info
+        list($yyyy1, $mm1, $dd1) = split('[/.-]', $firstDayOfMth);
+        $month1 = $yyyy1 . "-" . $mm1;
+        $month = $month1;
 /*
-	  // only display cash balance for the current month entry, other months, display 0
-	  $curMth = date ("Y-m");
-	  if ( $month1 == $curMth ) {
-	    $thisMth = 1; 
-		$cash1 = $cash;
-	  }
-	  else {
-	    $thisMth = 0;
-		$cash1 = 0;
-	  }
-*/	  
-	  $query = "SELECT sum(amount) as monthlyPDchqAmount FROM student_scheduled_payments " .
-	     "WHERE student_id=$student_id AND course_id=$course_id " .
-		 "AND ( status = \"R\" OR status = \"D\" OR status = \"H\"  OR status = \"S\" ) " .
-	     "AND cheque_date BETWEEN \"$firstDayOfMth\" AND \"$lastDayOfMth\" AND school_year = \"$schYear\"; ";
-      //echo "$query<br>";
-	  $result = mysql_query($query, $promusic) or die(mysql_error());
-      $numRows = mysql_num_rows($result);
-      $row = mysql_fetch_array($result);
-      extract($row);
-      if ( $monthlyPDchqAmount == "" ) {
-	    $monthlyPDchqAmount = 0;
-		$month = $month1;
-		$number_of_lessons = 0;
-	  }
-	  $ttlSchPayment += $monthlyPDchqAmount;
+        // only display cash balance for the current month entry, other months, display 0
+        $curMth = date ("Y-m");
+        if ( $month1 == $curMth ) {
+          $thisMth = 1;
+          $cash1 = $cash;
+        }
+        else {
+          $thisMth = 0;
+          $cash1 = 0;
+        }
+*/
+        $query = "SELECT sum(amount) as monthlyPDchqAmount FROM student_scheduled_payments " .
+                 "WHERE student_id=$student_id AND course_id=$course_id " .
+                 "AND ( status = \"R\" OR status = \"D\" OR status = \"H\"  OR status = \"S\" ) " .
+                 "AND cheque_date BETWEEN \"$firstDayOfMth\" AND \"$lastDayOfMth\" AND school_year = \"$schYear\"; ";
 
-      /* $query = "SELECT month, number_of_lessons FROM student_scheduled_payments " .
-	       "WHERE student_id=$student_id AND course_id=$course_id " .
-	       "AND month = \"$month1\"; ";  */
-	  $query = "SELECT count(date) as number_of_lessons from class_schedule " .
-               "where student_id=$student_id and course_id=$course_id " .
-		       // "and ( class_type = '' or class_type is NULL )" .
-		       " and ( date between \"$firstDayOfMth\" and \"$lastDayOfMth\" ) " .
-		       " and ( (cancelled <> 'W' and cancelled <> 'T' and cancelled <> 'CXL' ) " .
-		       " or cancelled is NULL  or cancelled = \"\" )";
         //echo "$query<br>";
-      $result = mysql_query($query, $promusic) or die(mysql_error());
-      // $numRows = mysql_num_rows($result);
-      $row = mysql_fetch_array($result);
-      extract($row);
-	  if ( $number_of_lessons == "" ) {
-	    $number_of_lessons = 0;
-	  }  
-	  $ttlLessons += $number_of_lessons;
+        $result = mysql_query($query, $promusic) or die(mysql_error());
+        $numRows = mysql_num_rows($result);
+        $row = mysql_fetch_array($result);
+        extract($row);
 
-      $query = "select sum(duration * external_rate /15) as usageAmt from class_schedule " .
-           "where student_id=$student_id and course_id=$course_id " .
-		   // "and ( class_type = '' or class_type is NULL )" .
-		   " and ( date between \"$firstDayOfMth\" and \"$lastDayOfMth\" ) " .
-		   " and ( (cancelled <> 'W' and cancelled <> 'T' and cancelled <> 'CXL' ) " .
-		   " or cancelled is NULL  or cancelled = \"\" )";
+        if ( $monthlyPDchqAmount == "" ) {
+          $monthlyPDchqAmount = 0;
+          $month = $month1;
+          $number_of_lessons = 0;
+        }
+        $ttlSchPayment += $monthlyPDchqAmount;
+
+        /* $query = "SELECT month, number_of_lessons FROM student_scheduled_payments " .
+                    "WHERE student_id=$student_id AND course_id=$course_id " .
+                    "AND month = \"$month1\"; ";  */
+
+        $query = "SELECT count(date) as number_of_lessons from class_schedule " .
+                 "where student_id=$student_id and course_id=$course_id " .
+                 // "and ( class_type = '' or class_type is NULL )" .
+                 " and ( date between \"$firstDayOfMth\" and \"$lastDayOfMth\" ) " .
+                 " and ( (cancelled <> 'W' and cancelled <> 'T' and cancelled <> 'CXL' ) " .
+                 " or cancelled is NULL  or cancelled = \"\" )";
+
+        //echo "$query<br>";
+        $result = mysql_query($query, $promusic) or die(mysql_error());
+        // $numRows = mysql_num_rows($result);
+        $row = mysql_fetch_array($result);
+        extract($row);
+
+        if ( $number_of_lessons == "" ) {
+          $number_of_lessons = 0;
+        }
+        $ttlLessons += $number_of_lessons;
+
+        $query = "select sum(duration * external_rate /15) as usageAmt from class_schedule " .
+                 "where student_id=$student_id and course_id=$course_id " .
+                 // "and ( class_type = '' or class_type is NULL )" .
+                 " and ( date between \"$firstDayOfMth\" and \"$lastDayOfMth\" ) " .
+                 " and ( (cancelled <> 'W' and cancelled <> 'T' and cancelled <> 'CXL' ) " .
+                 " or cancelled is NULL  or cancelled = \"\" )";
+        //echo "$query<br>";
+
+        $result = mysql_query($query, $promusic) or die(mysql_error());
+        $row = mysql_fetch_array($result);
+        extract($row);
+
+        if ( $usageAmt == "" ) {
+          $usageAmt = 0;
+        }  // end if numRows = null
+        $ttlUsage += $usageAmt;
+	  
+        $query = "SELECT sum(amount) as adHocPayment from adhoc_payments " .
+                 "where student_id=$student_id and course_id=$course_id and " .
+                 "date between \"$firstDayOfMth\" and \"$lastDayOfMth\" and school_year = \"$schYear\" ";
+
+        $result = mysql_query($query, $promusic) or die(mysql_error());
+        $row = mysql_fetch_array($result);
+        extract($row);
+
+        if ( $adHocPayment == "" ) {
+          $adHocPayment = 0;
+        }  // end if numRows = null
+        $ttlAdHoc += $adHocPayment;
+	  
+        $query = "SELECT sum(amount) as miscAmt from misc_items " .
+                 "where student_id=$student_id and course_id=$course_id and " .
+                 "date between \"$firstDayOfMth\" and \"$lastDayOfMth\" AND school_year = \"$schYear\"";
+
+        $result = mysql_query($query, $promusic) or die(mysql_error());
+        $row = mysql_fetch_array($result);
+        extract($row);
+
+        if ( $miscAmt == "" ) {
+          $miscAmt = 0;
+        }  // end if numRows = null
+        $ttlMiscAmt += $miscAmt;
+
+        // Calculate monthly W and T credit equivalent amount
+        $query = "SELECT sum(minute_balance * external_rate / 15) as WmonthlyAmt  from student_credit_minutes " .
+                 "WHERE student_id=$student_id and credit_type = 'W' and ( date between \"$firstDayOfMth\" and  \"$lastDayOfMth\" ) and course_id=$course_id";
+        // echo "$query<br>";
+
+        $result = mysql_query($query, $promusic) or die(mysql_error());
+        $row = mysql_fetch_array($result);
+        extract($row);
+  
+        if ( $WmonthlyAmt == NULL || $WmonthlyAmt == "" ) {
+          $WmonthlyAmt = 0;
+        }
+        $WrunningTotal += $WmonthlyAmt;
+	  
+        // Calculate monthly W and T credit equivalent amount
+        $query = "SELECT sum(minute_balance * external_rate / 15) as TmonthlyAmt  from student_credit_minutes " .
+                 "WHERE student_id=$student_id and credit_type = 'T' and ( date between \"$firstDayOfMth\" and  \"$lastDayOfMth\" ) and course_id=$course_id";
+        // echo "$query<br>";
+
+        $result = mysql_query($query, $promusic) or die(mysql_error());
+        $row = mysql_fetch_array($result);
+        extract($row);
+  
+        if ( $TmonthlyAmt == NULL || $TmonthlyAmt == "" ) {
+          $TmonthlyAmt = 0;
+        }
+        $TrunningTotal += $TmonthlyAmt;
+	  
+        $balance += $monthlyPDchqAmount + $adHocPayment - $miscAmt - $usageAmt;
+        require ('balance_report_row_entry.php');
+        $mm += 1;
+
+        $firstDayOfMth = date ("Y-m-d", mktime(0, 0, 0, date("$mm")  , 1, $fromYear));
+        $lastDayOfMth = date ("Y-m-d", mktime(0, 0, 0, date("$mm")+1  , 0, $fromYear));
+        $i += 1;
+      }  // end while
+
+      // now display after school year row
+      $monthlyPDchqAmount = 0;
+      $adHocPayment = 0;
+      $miscAmt = 0;
+      $usageAmt = 0;
+      $number_of_lessons = 0;
+      $month = "After Year";
+	  
+      $query = "SELECT sum(amount) as monthlyPDchqAmount FROM student_scheduled_payments " .
+               "WHERE student_id=$student_id AND course_id=$course_id " .
+               "AND ( status = \"R\" OR status = \"D\" OR status = \"H\"  OR status = \"S\" ) " .
+               "AND cheque_date > \"$yearEndDate\" and school_year = \"$schYear\"";
       //echo "$query<br>";
       $result = mysql_query($query, $promusic) or die(mysql_error());
-      $row = mysql_fetch_array($result);
-      extract($row);
-      if ( $usageAmt == "" ) {
-	    $usageAmt = 0;
-	  }  // end if numRows = null
-	  $ttlUsage += $usageAmt;
-	  
-	  $query = "SELECT sum(amount) as adHocPayment from adhoc_payments " .
-	     "where student_id=$student_id and course_id=$course_id and " .
-		 "date between \"$firstDayOfMth\" and \"$lastDayOfMth\" and school_year = \"$schYear\" ";
-      $result = mysql_query($query, $promusic) or die(mysql_error());
-      $row = mysql_fetch_array($result);
-      extract($row);
-      if ( $adHocPayment == "" ) {
-	    $adHocPayment = 0;
-	  }  // end if numRows = null
-	  $ttlAdHoc += $adHocPayment;
-	  
-	  $query = "SELECT sum(amount) as miscAmt from misc_items " .
-	     "where student_id=$student_id and course_id=$course_id and " .
-		 "date between \"$firstDayOfMth\" and \"$lastDayOfMth\" AND school_year = \"$schYear\"";
-      $result = mysql_query($query, $promusic) or die(mysql_error());
-      $row = mysql_fetch_array($result);
-      extract($row);
-      if ( $miscAmt == "" ) {
-	    $miscAmt = 0;
-	  }  // end if numRows = null
-	  $ttlMiscAmt += $miscAmt;
-	  
-	  
-	  // Calculate monthly W and T credit equivalent amount
-	  $query = "SELECT sum(minute_balance * external_rate / 15) as WmonthlyAmt  from student_credit_minutes " .
-           "WHERE student_id=$student_id and credit_type = 'W' and ( date between \"$firstDayOfMth\" and  \"$lastDayOfMth\" ) and course_id=$course_id";
-      // echo "$query<br>";
-      $result = mysql_query($query, $promusic) or die(mysql_error());
-      $row = mysql_fetch_array($result);
-      extract($row);
-  
-      if ( $WmonthlyAmt == NULL || $WmonthlyAmt == "" ) { $WmonthlyAmt = 0; }
-	  $WrunningTotal += $WmonthlyAmt;
-	  
-	  // Calculate monthly W and T credit equivalent amount
-	  $query = "SELECT sum(minute_balance * external_rate / 15) as TmonthlyAmt  from student_credit_minutes " .
-           "WHERE student_id=$student_id and credit_type = 'T' and ( date between \"$firstDayOfMth\" and  \"$lastDayOfMth\" ) and course_id=$course_id";
-      // echo "$query<br>";
-      $result = mysql_query($query, $promusic) or die(mysql_error());
-      $row = mysql_fetch_array($result);
-      extract($row);
-  
-      if ( $TmonthlyAmt == NULL || $TmonthlyAmt == "" ) { $TmonthlyAmt = 0; }
-	  $TrunningTotal += $TmonthlyAmt;
-	  
-	  $balance += $monthlyPDchqAmount + $adHocPayment - $miscAmt - $usageAmt;
-      require ('balance_report_row_entry.php');
-	  $mm += 1;
-	  $firstDayOfMth = date ("Y-m-d", mktime(0, 0, 0, date("$mm")  , 1, $fromYear));
-	  $lastDayOfMth = date ("Y-m-d", mktime(0, 0, 0, date("$mm")+1  , 0, $fromYear));
-	  $i += 1;
-	}  // end while
-
-	// now display after school year row
-	$monthlyPDchqAmount = 0;
-	$adHocPayment = 0;
-	$miscAmt = 0;
-	$usageAmt = 0;
-    $number_of_lessons = 0;
-	  $month = "After Year";
-	  
-	  $query = "SELECT sum(amount) as monthlyPDchqAmount FROM student_scheduled_payments " .
-	     "WHERE student_id=$student_id AND course_id=$course_id " .
-		 "AND ( status = \"R\" OR status = \"D\" OR status = \"H\"  OR status = \"S\" ) " .
-	     "AND cheque_date > \"$yearEndDate\" and school_year = \"$schYear\"";
-      //echo "$query<br>";
-	  $result = mysql_query($query, $promusic) or die(mysql_error());
       $numRows = mysql_num_rows($result);
       $row = mysql_fetch_array($result);
       extract($row);
+
       if ( $monthlyPDchqAmount == "" ) {
-	    $monthlyPDchqAmount = 0;
-	  }
-	  $ttlSchPayment += $monthlyPDchqAmount;
+        $monthlyPDchqAmount = 0;
+      }
+      $ttlSchPayment += $monthlyPDchqAmount;
 	  
-	  $query = "SELECT sum(amount) as adHocPayment from adhoc_payments " .
-	     "where student_id=$student_id and course_id=$course_id and " .
-		 "date > \"$yearEndDate\" and school_year = \"$schYear\"";
+      $query = "SELECT sum(amount) as adHocPayment from adhoc_payments " .
+               "where student_id=$student_id and course_id=$course_id and " .
+               "date > \"$yearEndDate\" and school_year = \"$schYear\"";
+
       $result = mysql_query($query, $promusic) or die(mysql_error());
       $row = mysql_fetch_array($result);
       extract($row);
+
       if ( $adHocPayment == "" ) {
-	    $adHocPayment = 0;
-	  }  // end if numRows = null
-	  $ttlAdHoc += $adHocPayment;
+        $adHocPayment = 0;
+      }  // end if numRows = null
+      $ttlAdHoc += $adHocPayment;
 
-	  $query = "SELECT sum(amount) as miscAmt from misc_items " .
-	     "where student_id=$student_id and course_id=$course_id and " .
-		 "date > \"$yearEndDate\" and school_year = \"$schYear\"";
+      $query = "SELECT sum(amount) as miscAmt from misc_items " .
+               "where student_id=$student_id and course_id=$course_id and " .
+               "date > \"$yearEndDate\" and school_year = \"$schYear\"";
+
       $result = mysql_query($query, $promusic) or die(mysql_error());
       $row = mysql_fetch_array($result);
       extract($row);
-      if ( $miscAmt == "" ) {
-	    $miscAmt = 0;
-	  }  // end if numRows = null
-	  $ttlMiscAmt += $miscAmt;
-	  
-	  $balance += $monthlyPDchqAmount + $adHocPayment - $miscAmt - $usageAmt;
-      require ('balance_report_row_entry.php');
-	  $i += 1;
-	
-	
-	// display bottomline totals
-	$strong = 1;
-	$month = "Totals";
-	$number_of_lessons = $ttlLessons;
-	$monthlyPDchqAmount = $ttlSchPayment;
-	$adHocPayment = $ttlAdHoc;
-	$miscAmt = $ttlMiscAmt;
-	$usageAmt = $ttlUsage;
-    require ('balance_report_row_entry.php');
-	
-  }  // end if no registered class founded  numRows = 0	
-  }  // end if error = 0
 
+      if ( $miscAmt == "" ) {
+        $miscAmt = 0;
+      }  // end if numRows = null
+      $ttlMiscAmt += $miscAmt;
+	  
+      $balance += $monthlyPDchqAmount + $adHocPayment - $miscAmt - $usageAmt;
+      require ('balance_report_row_entry.php');
+      $i += 1;
+	
+      // display bottomline totals
+      $strong = 1;
+      $month = "Totals";
+      $number_of_lessons = $ttlLessons;
+      $monthlyPDchqAmount = $ttlSchPayment;
+      $adHocPayment = $ttlAdHoc;
+      $miscAmt = $ttlMiscAmt;
+      $usageAmt = $ttlUsage;
+      require ('balance_report_row_entry.php');
+
+    }  // end if no registered class founded  numRows = 0
+  }  // end if error = 0
 }  // end if action = 1
 
 if ( $error == 0 && $course_id <> "" ) require ('balance_report_trailer.php');

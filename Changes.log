@@ -156,3 +156,8 @@ Fixed add_classes.php:
 [2018-11-21]
 - Removed "red-white" internal_cost and cost_type debug fields
 
+[2018-11-22]
+- Fixed undefined vars in balance_report.php & balance_report_row_entry.php
+- Fixed using uninitialized vars in balance_report.php & balance_report_row_entry.php
+- Fixed typo bug of $$ttlUsage in balance_report.php
+
