@@ -33,7 +33,7 @@ if ( $action <> "" ) {
     $startdate=$_POST['start_date'];
     $enddate=$_POST['end_date'];
     $teacher_id=$_POST['teacher_id'];
-	$delete=$_POST['delete'];
+    $delete=isset($_POST['delete']) ? $_POST['delete'] : "";
   }
   else {
     $teacherForm1=$_GET['teacher'];

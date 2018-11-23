@@ -161,3 +161,6 @@ Fixed add_classes.php:
 - Fixed using uninitialized vars in balance_report.php & balance_report_row_entry.php
 - Fixed typo bug of $$ttlUsage in balance_report.php
 
+[2018-11-22]
+- Fixed undefined vars for teacher_payments.php, misc_items.php & adhoc_payments.php
+
