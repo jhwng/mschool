@@ -16,7 +16,7 @@
 <?php if ($duration <> "" ) { echo "VALUE=\"$duration\""; } ?>/>
 &nbsp;&nbsp;&nbsp;Tuition Fee:
 <input name="tuition_fee" type="text" id="tuition_fee" size="8" maxlength="10" 
-<?php if ($external_rate > 0 ) { $fee = number_format($external_rate * $duration / 15,2); echo "VALUE=\"$fee\""; } ?>/>
+<?php if (isset($external_rate) && $external_rate > 0 ) { $fee = number_format($external_rate * $duration / 15,2); echo "VALUE=\"$fee\""; } ?>/>
 &nbsp;&nbsp;&nbsp;Day of Week: <input name="dow" type="text" id="dow" size="3" maxlength="3" 
 <?php if ($dow <> "" ) { echo "VALUE=\"$dayOfWeek[$dow]\""; } ?>/><br></br>
 <span class="style4">School Year: <?php echo "$schYear"; ?>&nbsp;&nbsp;&nbsp;&nbsp;</span>Course: <?php echo "$courseName"; ?><br><br>

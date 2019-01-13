@@ -38,10 +38,10 @@ body {
 
 <?php
 /*
-actuin = 2 - update course list
+action = 2 - update course list
 */
-$action = $_GET['action'];
-$submit = $_POST['submit1'];
+$action = isset($_GET['action']) ? $_GET['action'] : "";
+$submit = isset($_POST['submit1']) ? $_POST['submit1'] : "";
 
 include 'banner1.php';
 

@@ -4,9 +4,9 @@
 mysql_select_db($database_promusic, $promusic);
 
 // action = 1 - retrieve payment schedule via POST
-// action = 2 - update payment schedule
+// action = 2 - update payment schedule (from adhoc_payments_trailer's form submit "Update Ad-hoc Payments" button)
 // action = 3 - get course list only
-// action =4 - retrieve payment schedule via GET
+// action = 4 - retrieve payment schedule via GET
 
 //Bjng
 $startdate = "";
@@ -16,16 +16,95 @@ $courseName = "";
 $student_id = "";
 $numRows = 0;
 $numRows_schedule = 0;
+$getNextOrPrevYearAct=0;
+
+$paymentID = 0;
+$userID = "";
+$userName = "";
+$timestamp = "";
+
+//Ejng
+
+//Bjng
+if ( isset($_REQUEST['getNextYear']) || isset($_REQUEST['getPrevYear']) ){
+  $startdate = $_POST['start_date'];
+  $enddate=$_POST['end_date'];
+  //echo "start: $startdate ";
+  //echo "end: $enddate ";
+
+  $startdate_array=date_parse($startdate);
+  $enddate_array=date_parse($enddate);
+
+  //if ($action == "next_year") {
+  if (isset($_REQUEST['getNextYear'])) {
+    //echo "getNextYear ";
+    $startYear = $startdate_array['year'] + 1;
+    $endYear = $enddate_array['year'] + 1;
+  }
+  else { // prev_year
+    //echo "getPrevYear ";
+    $startYear = $startdate_array['year'] - 1;
+    $endYear = $enddate_array['year'] - 1;
+  }
+
+  $start_month_day=strstr($startdate, '-');
+  $end_month_day=strstr($enddate, '-');
+
+  /* Just need to set $startdate and $enddate here. The other vars like
+   * $fullname, $courseName, etc are set in the logic below since $action
+   * is still "searchclasses".
+   */
+  $startdate = $startYear . $start_month_day;
+  $enddate = $endYear . $end_month_day;
+
+  //echo "start: $startdate ";
+  //echo "end: $enddate ";
+
+  $getNextOrPrevYearAct = 1;
+}
 //Ejng
 
 $action=isset($_GET['action']) ? $_GET['action'] : "";
+
 if ( $action <> "" ) {
   if ( $action <> 4 ) {
     $fullname=$_POST['full_name'];
     $courseName=isset($_POST['course_name']) ? $_POST['course_name'] : "";
     $schyear=isset($_POST['school_year']) ? $_POST['school_year'] : "";
-    $startdate=$_POST['start_date'];
-    $enddate=$_POST['end_date'];
+
+    if ($getNextOrPrevYearAct == 0 ) { //jng
+      $startdate = $_POST['start_date'];
+      $enddate = $_POST['end_date'];
+
+      // Bjng
+      // Set/initialize a "session" course for subsequent get-prev-year or get-next-year "session".
+      // Note that the following cases trigger an "internal click" of the "Retrieve Payments" button,
+      // which in turn triggers a form action=1:
+      //  - action=2
+      //  - action=3 (and student only has 1 registered class)
+      //  - action=4
+      //  - user selected an item from drop-down "Course" list
+      // So handling "action=1" only is sufficient.
+      if ($action == 1) {
+        if ($courseName != "" && $courseName != "0") {
+          $_SESSION['getPrevOrNextYearSessionCourse_adhocPay'] = $courseName;
+        }
+      }
+    }
+    else if (isset($_SESSION['getPrevOrNextYearSessionCourse_adhocPay'])){
+      // If we're handling a get-prev-year or get-next-year flow and
+      // no session course name is set yet because the previous page
+      // (ie, either following or previous year) had > 1 courses, then
+       // reset $courseName since it's POSTed from previuos page and
+      // may not apply here. On the other hand, if the session course
+      // is set let's set $courseName to that to continue the session.
+      if ($_SESSION['getPrevOrNextYearSessionCourse_adhocPay'] == "") {
+        $courseName = "";
+      } else {
+        $courseName = $_SESSION['getPrevOrNextYearSessionCourse_adhocPay'];
+      }
+    }
+
     $time=isset($_POST['time']) ? $_POST['time'] : "";
     $duration=isset($_POST['duration']) ? $_POST['duration'] : "";
     $teacher=isset($_POST['teacher']) ? $_POST['teacher'] : "";
@@ -48,6 +127,10 @@ if ( $action <> "" ) {
   $row = mysql_fetch_array($result);
   extract($row);
   }
+}
+else { // jng
+  // Reset per-year-session course name if no action is specified (ie, first landing on this page)
+  $_SESSION['getPrevOrNextYearSessionCourse_adhocPay'] = "";
 }
 
 
@@ -148,7 +231,24 @@ body {
       $numRows = mysql_num_rows($result);
 	  while ( list ($courseID1, $courseName1) = mysql_fetch_row($result)) {
 	     echo "<option value=\"$courseName1\" ";
-		 if ( $courseName == $courseName1 || $action == 3 ) { echo 'selected="selected"'; }
+		 if ( $courseName == $courseName1 || $action == 3 ) {
+		   echo 'selected="selected"';
+
+           // Set the chosen course as the subsequent get-prev-year or
+           // get-next-year session course name.
+           $_SESSION['getPrevOrNextYearSessionCourse_adhocPay'] = $courseName1;
+		 }
+		 else {
+           // Bjng
+           // If we're doing get prev/next year but there's no course name set
+           // (either because the previous page had no course or more than 1 course)
+           // and this is the only course available, set it as get-year-session course name.
+           if ($getNextOrPrevYearAct == 1 && $numRows == 1 && $courseName == "") {
+             $courseName = $courseName1;
+             $_SESSION['getPrevOrNextYearSessionCourse_adhocPay'] = $courseName1;
+           }
+           //Ejng
+         }
 		 echo " >$courseName1</option>";
       }
 	}
@@ -175,6 +275,24 @@ body {
    onclick='document.form1.action="adhoc_payments.php?action=1"; return true;'
    onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Retrieve Payments"/>
             </div></td>
+          </tr>
+          <tr>
+            <table width="772">
+            <tr>
+            <td width="50"></td>
+            <td width="50"></td>
+            <td><div align="left">
+              <input name="getPrevYear" type="submit" class="btn" id="getPrevYear"
+                onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Prev Year"
+                onclick='document.form1.action="adhoc_payments.php?action=1"; return true;' />
+              <input name="getNextYear" type="submit" class="btn" id="getNextYear"
+                onmouseover="this.className='btn btnhov'" onmouseout="this.className='btn'" value="Next Year"
+                onclick='document.form1.action="adhoc_payments.php?action=1"; return true;' />
+
+              <!--input name="numCoursesInPrevPage" type="hidden" id="num_courses_prev_page" value="<?php /*echo $numRows;*/ ?>" /--> <!--//jng-->
+            </div></td>
+            </tr>
+            </table>
           </tr>
         </table>
           </div>
@@ -233,54 +351,73 @@ if ( $action == 1 ) {
 			 "student_registered_classes.school_year=\"$schYear\";";
     $result = mysql_query($query, $promusic) or die(mysql_error());
     $row = mysql_fetch_array($result);
-    extract($row);
-	
-		 
-	// now retrieve adhoc_payments entries
-	list ($sYYYY, $sMth, $dd ) = split ('-', $startdate);
-	$startMonth = $sYYYY . "-" . $sMth;
-	list ($eYYYY, $eMth, $dd ) = split ('-', $enddate);
-	$endMonth = $eYYYY . "-" . $eMth;
-    $firstDayOfYear = date ("Y-m-d", mktime(0, 0, 0, 7, 1, $fromYear));
-    $lastDayOfYear = date ("Y-m-d", mktime(0, 0, 0, 6, 30, $toYear));
-	
-	// multiple reference by 1 so as to convert it from varChar to numeric for sorting purpose
-	$query = "SELECT payment_id, date, amount, cheque_num, cheque_name, " .
-	         "payment_method, remarks, reference * 1 as monthAllocate, adhoc_payments.user_id, user_name, " .
-			 "DATE_FORMAT(adhoc_payments.timestamp,'%Y-%m-%d %H:%i') " .
-			 "FROM adhoc_payments, user " .
-			 "WHERE adhoc_payments.user_id = user.user_id " .
-			 "AND student_id=$student_id AND course_id=$course_id " .
-			 // "AND date BETWEEN \"$firstDayOfYear\" AND \"$lastDayOfYear\" " .
-			 // "AND date >= \"$firstDayOfYear\" " .
-			 // "AND date >= \"$startdate\" " .
-			 "AND school_year = \"$schYear\" " .
-			 "ORDER BY date, monthAllocate;";
+    if ($row) { //jng
+      extract($row);
+    }
+    else {
+      if ($courseName === "") {
+        $class_not_found_msg="No registered class found.";
+      }
+      else {
+        $class_not_found_msg="No registered class found for <span class=\"red_blink\">$courseName</span>. &nbsp; Choose another course and click Retrieve.";
+      }
+
+      echo "
+        <table width='815' height='40' border='0' cellpadding='0' cellspacing='0'>
+          <tr>
+            <td width='83'>&nbsp;</td>
+            <td width='606' valign='middle'><div align='center'><span class='style2'>$class_not_found_msg</span></div></td>
+            <td width='61'>&nbsp;</td>
+          </tr>
+        </table>";
+
+      echo "<br><br>";
+    }
+
+    // now retrieve adhoc_payments entries
+    list ($sYYYY, $sMth, $dd) = split('-', $startdate);
+    $startMonth = $sYYYY . "-" . $sMth;
+    list ($eYYYY, $eMth, $dd) = split('-', $enddate);
+    $endMonth = $eYYYY . "-" . $eMth;
+    $firstDayOfYear = date("Y-m-d", mktime(0, 0, 0, 7, 1, $fromYear));
+    $lastDayOfYear = date("Y-m-d", mktime(0, 0, 0, 6, 30, $toYear));
+
+    // multiple reference by 1 so as to convert it from varChar to numeric for sorting purpose
+    $query = "SELECT payment_id, date, amount, cheque_num, cheque_name, " .
+            "payment_method, remarks, reference * 1 as monthAllocate, adhoc_payments.user_id, user_name, " .
+            "DATE_FORMAT(adhoc_payments.timestamp,'%Y-%m-%d %H:%i') " .
+            "FROM adhoc_payments, user " .
+            "WHERE adhoc_payments.user_id = user.user_id " .
+            "AND student_id=$student_id AND course_id=$course_id " .
+            // "AND date BETWEEN \"$firstDayOfYear\" AND \"$lastDayOfYear\" " .
+            // "AND date >= \"$firstDayOfYear\" " .
+            // "AND date >= \"$startdate\" " .
+            "AND school_year = \"$schYear\" " .
+            "ORDER BY date, monthAllocate;";
     // echo "$query<br>";
-	$result = mysql_query($query, $promusic) or die(mysql_error());
+    $result = mysql_query($query, $promusic) or die(mysql_error());
     $numRows_schedule = mysql_num_rows($result);
-	
-	if ( $numRows > 0 ) {
-	
-	  // setup arrary to display dow
-	  $dayOfWeek[0] = "Sun";
-	  $dayOfWeek[1] = "Mon";
-	  $dayOfWeek[2] = "Tue";
-	  $dayOfWeek[3] = "Wed";
-	  $dayOfWeek[4] = "Thu";
-	  $dayOfWeek[5] = "Fri";
+
+    if ($numRows_schedule > 0) {
+      // setup arrary to display dow
+      $dayOfWeek[0] = "Sun";
+      $dayOfWeek[1] = "Mon";
+      $dayOfWeek[2] = "Tue";
+      $dayOfWeek[3] = "Wed";
+      $dayOfWeek[4] = "Thu";
+      $dayOfWeek[5] = "Fri";
       $dayOfWeek[6] = "Sat";
-	
-      require ('adhoc_payments_header_row.php');
-	}
-	
-	$j = 0;
-    while ( list ($paymentID, $date, $amount, $chqNum, $chqName, $paymentMethod, $remarks, $ref, $userID, $userName, $timestamp) = mysql_fetch_row($result)) {
-	   if ( $ref == 0 ) $ref = "";
-       require ('adhoc_payments_row_entry.php');
-	   $j += 1;
-	}  // End while
-    
+
+      require('adhoc_payments_header_row.php');
+
+      $j = 0;
+      while (list ($paymentID, $date, $amount, $chqNum, $chqName, $paymentMethod, $remarks, $ref, $userID, $userName, $timestamp) = mysql_fetch_row($result)) {
+        if ($ref == 0) $ref = "";
+          require('adhoc_payments_row_entry.php');
+        $j += 1;
+      }  // End while
+    } // if ($num_Rows_schedule > 0)
+
 	// Display 10 blank form lines for adding new entry
 	$date = "";
 	$amount = 0;
@@ -292,13 +429,29 @@ if ( $action == 1 ) {
 	$userName="&nbsp;";
 	$timestamp="&nbsp;";
 	$i = 1;
+
+    //Bjng
+    if (!isset($j)) {
+      // setup arrary to display dow
+      $dayOfWeek[0] = "Sun";
+      $dayOfWeek[1] = "Mon";
+      $dayOfWeek[2] = "Tue";
+      $dayOfWeek[3] = "Wed";
+      $dayOfWeek[4] = "Thu";
+      $dayOfWeek[5] = "Fri";
+      $dayOfWeek[6] = "Sat";
+
+      require('adhoc_payments_header_row.php');
+      $j = 0;
+    }
+    //Ejng
+
     while ( $i <= 5 ) {
 	  require ('adhoc_payments_row_entry.php');
 	  $i += 1;
 	  $j += 1;
 	}
   }
-    
 }  // End if action = 1
 
 if ( $action == 2 ) {

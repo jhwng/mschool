@@ -10,24 +10,34 @@ $versionNum = "1.00.01";
 // action = 1 - retrieve payment schedule via POST
 // action = 2 - update payment schedule
 // action = 3 - get course list only
-// action =4 - retrieve payment schedule via GET
+// action = 4 - retrieve payment schedule via GET
 //echo "$thisUserID<br>";
 
-$action=$_GET['action'];
+//Bjng
+$startdate = "";
+$fullname = "";
+$course_id = "";
+$courseName = "";
+$student_id = "";
+$numRows = 0;
+$numRows_schedule = 0;
+//Ejng
+
+$action=isset($_GET['action']) ? $_GET['action'] : "";
 if ( $action <> "" ) {
   if ( $action <> 4 ) {
     $fullname=$_POST['full_name'];
-    $courseName=$_POST['course_name'];
-    $schyear=$_POST['school_year'];
+    $courseName=isset($_POST['course_name']) ? $_POST['course_name'] : "";
+    $schyear=isset($_POST['school_year']) ? $_POST['school_year'] : "";
     $startdate=$_POST['start_date'];
     $enddate=$_POST['end_date'];
-    $time=$_POST['time'];
-    $duration=$_POST['duration'];
-    $teacher=$_POST['teacher'];
+    $time=isset($_POST['time']) ? $_POST['time'] : "";
+    $duration=isset($_POST['duration']) ? $_POST['duration'] : "";
+    $teacher=isset($_POST['teacher']) ? $_POST['teacher'] : "";
     $student_id=$_POST['student_id'];
-    $dow=$_POST['dow'];
+    $dow=isset($_POST['dow']) ? $_POST['dow'] : "";
     $course_id=$_POST['course_id'];
-	$delete=$_POST['delete'];
+    $delete=isset($_POST['delete']) ? $_POST['delete'] : "";
   }
   else {
     $fullname=$_GET['full_name'];

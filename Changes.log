@@ -164,3 +164,9 @@ Fixed add_classes.php:
 [2018-11-22]
 - Fixed undefined vars for teacher_payments.php, misc_items.php & adhoc_payments.php
 
+[2019-01-13]
+- Fixed undefined vars in adhoc_payments.php, adhoc_payments_header_row.php,
+  change_password.php, course_list.php, payment_schedule.php
+- Some code cleanup in change_password.php
+- Added "Prev Year" and "Next Year" buttons to "Ad-hoc payments"
+  (adhoc_payments.php & student_name_search.php)

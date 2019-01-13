@@ -3,10 +3,9 @@
 <script type="text/javascript" src="checkform.js"> </script>
 <?php
 mysql_select_db($database_promusic, $promusic);
-$userName = $_POST['username'];
-$passWord = $_POST['password'];
-$passWord2 = $_POST['password2'];
-
+$userName = isset($_POST['username']) ? $_POST['username'] : "";
+$passWord = isset($_POST['password']) ? $_POST['password'] : "";
+$passWord2 = isset($_POST['password2']) ? $_POST['password2'] : "";
 
 
 if ( isset($_POST['Submit'])) {  // user submit password
@@ -18,10 +17,10 @@ if ( isset($_POST['Submit'])) {  // user submit password
     extract($row);
   }	
   else {
-    $passwordDB = "not valid kdieodkeie";
+    $passwordDB = "not valid kdieodkeie"; //jng - WTF??
   }
   
-  echo "$user_type<br>";
+  //echo "$user_type<br>"; //jng - dead code
   if ( $passWord == $passwordDB || $thisUserType >= 2 ) {
 	$status = "Password Changed";
 	$query = "UPDATE user SET password = \"$passWord2\" WHERE user_id = $user_id";
@@ -41,7 +40,7 @@ if ( isset($_POST['Submit'])) {  // user submit password
 <body onLoad='document.form1.password.focus();'>
 <?php include "banner1.php"; ?>
 <p>
-	<form id="form1" name="form1" actin="login.php" method="post" >
+	<form id="form1" name="form1" method="post" >
 	  <table width="750" border="0" cellspacing="0" cellpadding="0">
       <tr>
 	  <td width="230">&nbsp;</td>
@@ -50,7 +49,7 @@ if ( isset($_POST['Submit'])) {  // user submit password
 <input type="hidden" name="redirect" value="<?php echo $_POST['redirect']; ?>">
 	  Username:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" name="username" value="<?php echo $_POST['username']; ?>"><br>
 	  Password:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="password" name="password"><br>
-	  New Password: <input type="password2" name="password2" value="<?php echo $_POST['password2']; ?>"><br>
+	  New Password: <input type="password" name="password2" value="<?php echo $passWord2; ?>"><br>
 	  <p>
 	<input name="Submit" type="submit" class="btn" id="Submit"
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Change Password"/>
@@ -78,16 +77,27 @@ else {
 	  $redirect = "index.php";
 	}
 	?>
-	<form id="form1" name="form1" actin="login.php" method="post" >
+	<form id="form1" name="form1" method="post" >
 	  <table width="750" border="0" cellspacing="0" cellpadding="0">
       <tr>
 	  <td width="230">&nbsp;</td>
 	  <td><span class="style2">Password Change</span><br>
 	    <br>
-<input type="hidden" name="redirect" value="<?php echo $_POST['redirect']; ?>">
+<input type="hidden" name="redirect"
+  value="
+  <?php
+  if (isset($_POST['redirect'])) {
+      echo $_POST['redirect'];
+  } else {
+      echo "";
+  }
+  ?>">
 	  Username:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" name="username" value="<?php echo $thisUserName; ?>"><br>
 	  Password:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="password" name="password"><br>
-	  New Password: <input type="password2" name="password2" value="<?php echo $_POST['password2']; ?>"><br>
+	  New Password:&nbsp; <input type="password" name="password2"
+                           value="<?php
+                           echo $passWord2;
+                           ?>"><br>
 	  <p>
 	<input name="Submit" type="submit" class="btn" id="Submit"
    onmouseover="this.className='btn btnhov'" onMouseOut="this.className='btn'" value="Change Password"/>
@@ -100,6 +110,3 @@ else {
   ?>
   </body>
   </html>
-	  
-	
-  
