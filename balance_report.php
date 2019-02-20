@@ -345,10 +345,18 @@ if ( $action == 1 ) {
           $cash1 = 0;
         }
 */
+
+        $allottedMonth = date("Y-m", strtotime($firstDayOfMth));
+        //echo "adhoc_payments: allottedMonth: $allottedMonth\n";
+
+        // In this query we care about which month the cheque was allotted to,
+        // rather than date the cheque was given (ie, cheque_date).
         $query = "SELECT sum(amount) as monthlyPDchqAmount FROM student_scheduled_payments " .
                  "WHERE student_id=$student_id AND course_id=$course_id " .
                  "AND ( status = \"R\" OR status = \"D\" OR status = \"H\"  OR status = \"S\" ) " .
-                 "AND cheque_date BETWEEN \"$firstDayOfMth\" AND \"$lastDayOfMth\" AND school_year = \"$schYear\"; ";
+                 "AND month = \"$allottedMonth\" " .
+                 #"AND cheque_date BETWEEN \"$firstDayOfMth\" AND \"$lastDayOfMth\" " .
+                 "AND school_year = \"$schYear\"; ";
 
         //echo "$query<br>";
         $result = mysql_query($query, $promusic) or die(mysql_error());
@@ -401,10 +409,17 @@ if ( $action == 1 ) {
           $usageAmt = 0;
         }  // end if numRows = null
         $ttlUsage += $usageAmt;
-	  
+
+        $allottedMonth = ltrim(date("m", strtotime($firstDayOfMth)), "0"); // remove leading 0 from month str
+        //echo "adhoc_payments: allottedMonth: $allottedMonth\n";
+
+        // In this query we care about which month the ad-hoc payment
+        // was allotted to, rather than date the payment was made.
         $query = "SELECT sum(amount) as adHocPayment from adhoc_payments " .
                  "where student_id=$student_id and course_id=$course_id and " .
-                 "date between \"$firstDayOfMth\" and \"$lastDayOfMth\" and school_year = \"$schYear\" ";
+                 "reference=$allottedMonth and " .
+                 //"date between \"$firstDayOfMth\" and \"$lastDayOfMth\" and " .
+                 "school_year = \"$schYear\" ";
 
         $result = mysql_query($query, $promusic) or die(mysql_error());
         $row = mysql_fetch_array($result);

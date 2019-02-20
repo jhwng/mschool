@@ -364,7 +364,17 @@ if ( $error == 0 ) {
 		$nextMth = date ('Y-m', $cTimeStamp);
 		// echo "curMth = $curMth,  nextMth = $nextMth<br>";
 		if ( $curMth <> $nextMth || $cTimeStamp > $eTimeStamp ) {
-		  $chq_date = $curMth . "-01";
+          //Bjng
+          //$chq_date = $curMth . "-01";
+          if (intval(date("m", strtotime($curMth))) != 1) {
+              $chq_date_mth = date("Y", strtotime($curMth)) . "-" . strval(intval(date("m", strtotime($curMth)))-1);
+          }
+          else {
+              $chq_date_mth = strval(intval(date("Y", strtotime($curMth)))-1) . "-12";
+          }
+          $chq_date = $chq_date_mth . "-15";
+          //Ejng
+
 	      $query = "INSERT INTO student_scheduled_payments " .
 		     "(student_id, month, amount, number_of_lessons, duration, external_rate, " .
 			 "course_id, cheque_date, school_year, user_id ) VALUES " .

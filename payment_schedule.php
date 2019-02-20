@@ -322,12 +322,12 @@ if ( $action == 1 ) {
 	$result2 = mysql_query($query, $promusic) or die(mysql_error());
     $numRows_scheduleL = mysql_num_rows($result2);
 	$numRows_schedule += $numRows_scheduleL;
-	
+
     while ( list ($paymentID, $month, $chqDate, $numLessons, $amount, $chqNum, $chqName, $status, $paymentMethod, $remarks, $userID, $userName, $timestamp) = mysql_fetch_row($result2)) {
 	   require ('payment_schedule_row_entry.php');
 	   $j += 1;
 	}  // End while
-    
+
 	// Display 5 blank form line for adding new entry
 	$month = "";
 	$chqDate = "";

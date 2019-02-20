@@ -27,8 +27,8 @@
 	  <table width="1016" border="1" cellpadding="0" cellspacing="0">
         <tr>
           <td width="35" bgcolor="#FFBA75"><div align="center">Del</div></td>
-          <td width="70" height="20" bgcolor="#FFBA75"><div align="center">Month</div></td>
-          <td width="80" height="20" bgcolor="#FFBA75"><div align="center">Date</div></td>
+          <td width="70" height="20" bgcolor="#FFBA75"><div align="center">Month Allocation<br>(YYYY-MM)</div></td>
+          <td width="80" height="20" bgcolor="#FFBA75"><div align="center">Date<br>(YYYY-MM-DD)</div></td>
           <td width="60" height="20" bgcolor="#FFBA75"><div align="center">Usage</div></td>
           <td width="60" bgcolor="#FFBA75"><div align="center">Chq Amt</div></td>
           <td width="60" bgcolor="#FFBA75"><div align="center">Chq No. </div></td>

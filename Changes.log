@@ -170,3 +170,9 @@ Fixed add_classes.php:
 - Some code cleanup in change_password.php
 - Added "Prev Year" and "Next Year" buttons to "Ad-hoc payments"
   (adhoc_payments.php & student_name_search.php)
+
+[2019-02-20]
+- Fixed balance_report.php month-allocation for PD cheques and ad-hoc payment
+- Fixed default cheque date to 15th of previous month in student_create_2.php
+- Renamed "Month" column name to "Month Allocation" in payment_schedule_header_row.php
+
